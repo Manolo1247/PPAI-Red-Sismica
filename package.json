@@ -21,7 +21,9 @@
   "homepage": "https://github.com/Manolo1247/PPAI-Red-Sismica#readme",
   "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "sequelize": "^6.37.7",
+    "sqlite": "^5.1.1"
   },
   "devDependencies": {
     "eslint": "^8.57.1",
