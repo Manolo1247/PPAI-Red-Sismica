@@ -1,0 +1,21 @@
+{
+  "env": {
+    "browser": true, // Habilita las variables globales del navegador (window, document, etc.)
+    "node": true, // Habilita las variables globales de Node.js (require, module, etc.)
+    "es2021": true // Permite características de ECMAScript 2021
+  },
+  "extends": "airbnb-base", // Usa las reglas base de Airbnb para JavaScript
+  "parserOptions": {
+    "ecmaVersion": 12, // Especifica la versión de ECMAScript a usar
+    "sourceType": "module" // Permite el uso de módulos ES6
+  },
+  "rules": {
+    "no-console": "off", // Permite el uso de console.log para depuración
+    "indent": ["error", 2], // Enforce indentación de 2 espacios
+    "quotes": ["error", "double"], // Requiere el uso de comillas dobles
+    "semi": ["error", "always"], // Requiere el uso de punto y coma al final de las líneas
+    "no-unused-vars": ["warn"], // Advierte sobre variables declaradas pero no usadas
+    "eqeqeq": ["error", "always"], // Requiere el uso de comparaciones estrictas (=== y !==)
+    "curly": ["error", "all"] // Requiere el uso de llaves en todos los bloques
+  }
+}
