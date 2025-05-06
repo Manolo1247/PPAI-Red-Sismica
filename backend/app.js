@@ -7,4 +7,4 @@ app.use(express.static("frontend"));
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
-}); // Pruebo comentario para ver si me anda
+});
