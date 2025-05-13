@@ -7,63 +7,63 @@ class PantallaInicio(ctk.CTkFrame):
         self.controller = controller
 
         # Encabezado estilo Bootstrap
-        header_frame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)  # Azul de Bootstrap
-        header_frame.pack(fill="x", padx=10)  # Padding para los bordes
-        header_label = ctk.CTkLabel(
-            header_frame,
+        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)  # Azul de Bootstrap
+        headerFrame.pack(fill="x", padx=10)  # Padding para los bordes
+        headerLabel = ctk.CTkLabel(
+            headerFrame,
             text="Menú Principal",
             font=("Arial", 24, "bold"),
             text_color="white"
         )
-        header_label.pack(pady=20)
+        headerLabel.pack(pady=20)
 
         # Cuerpo estilo "card" con fondo claro
-        self.main_frame = ctk.CTkFrame(self, fg_color="#f8f9fa", corner_radius=12)  # Color de fondo claro
-        self.main_frame.pack(fill="both", expand=True, padx=80, pady=30)
+        self.mainFrame = ctk.CTkFrame(self, fg_color="#f8f9fa", corner_radius=12)  # Color de fondo claro
+        self.mainFrame.pack(fill="both", expand=True, padx=80, pady=30)
 
         # Estilo base para botones
-        boton_estilo = {
+        botonEstilo = {
             "width": 250,
             "height": 50,
             "font": ("Arial", 16),
         }
 
         # Botones centrados con estilo de Bootstrap
-        import_button = ctk.CTkButton(
-            self.main_frame,
+        registrarBtn = ctk.CTkButton(
+            self.mainFrame,
             text="Registrar Diagramación de Inspección de ES",
-            **boton_estilo,
+            **botonEstilo,
             fg_color="#0d6efd",  # Azul Bootstrap
             hover_color="#0b5ed7",  # Hover más oscuro
             corner_radius=8,
             #command=lambda: print("Diagramación")
         )
-        import_button.pack(pady=20)
+        registrarBtn.pack(pady=20)
 
-        view_button = ctk.CTkButton(
-            self.main_frame,
+        cerrarOrdenBtn = ctk.CTkButton(
+            self.mainFrame,
             text="Cerrar Orden de Inspección",
-            **boton_estilo,
+            **botonEstilo,
             fg_color="#0d6efd",  # Azul Bootstrap
             hover_color="#0b5ed7",  # Hover más oscuro
             corner_radius=8,
-            command=lambda: controller.show_frame(PantallaOrdenDeCierre)
+            command=lambda: controller.showFrame(PantallaOrdenDeCierre)
         )
-        view_button.pack(pady=20)
+        cerrarOrdenBtn.pack(pady=20)
 
-        close_button = ctk.CTkButton(
-            self.main_frame,
+        closeButton = ctk.CTkButton(
+            self.mainFrame,
             text="Cerrar",
-            **boton_estilo,
+            **botonEstilo,
             fg_color="#dc3545",  # Rojo Bootstrap
             hover_color="#c82333",  # Hover más oscuro
             corner_radius=8,
             command=sys.exit
         )
-        close_button.pack(pady=30)
+        closeButton.pack(pady=30)
 
         # Añadir bordes sutiles en el cuerpo y el encabezado, para un efecto de separación
-        self.main_frame.configure(border_color="#dcdcdc", border_width=1)  # Borde de separación
+        self.mainFrame.configure(border_color="#dcdcdc", border_width=1)  # Borde de separación
 
 
 class PantallaOrdenDeCierre(ctk.CTkFrame):
@@ -74,3 +74,6 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         label = ctk.CTkLabel(self, text="Pantalla Orden de Cierre", font=("Arial", 20))
         label.pack(pady=20)
 
+    def habilitarVentana(self):
+        # Aquí puedes habilitar la ventana o realizar otras acciones necesarias
+        pass

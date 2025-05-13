@@ -26,12 +26,12 @@ class Pantalla(ctk.CTk):
             frame.grid(row=0, column=0, sticky=ctk.NSEW)
 
         # Mostrar la pantalla principal inicialmente
-        self.show_frame(PantallaInicio)
+        self.showFrame(PantallaInicio)
 
-    def show_frame(self, container):
+    def showFrame(self, container):
         frame = self.frames[container]
-        if hasattr(frame, 'habilitar_ventana'):
-            frame.habilitar_ventana()
+        if hasattr(frame, 'habilitarVentana'):
+            frame.habilitarVentana()
         frame.tkraise()
 
 
