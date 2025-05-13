@@ -1,7 +1,7 @@
 -- Tabla: Rol
 CREATE TABLE IF NOT EXISTS Rol (
     nombre TEXT PRIMARY KEY,
-    descripcion TEXT
+    descripcion TEXT 
 );
 
 -- Tabla: Empleado
@@ -86,12 +86,12 @@ CREATE TABLE IF NOT EXISTS CambioDeEstado (
     fecha_hora_inicio DATETIME,
     ambito TEXT,
     nombre TEXT,
+    identificador_sismografo TEXT,
     fecha_hora_fin DATETIME,
     nombre_empleado TEXT,
     apellido_empleado TEXT,
     mail_empleado TEXT,
-    identificador_sismografo TEXT,
-    PRIMARY KEY (fecha_hora_inicio, ambito, nombre),
+    PRIMARY KEY (fecha_hora_inicio, ambito, nombre, identificador_sismografo),
     FOREIGN KEY (ambito, nombre) REFERENCES Estado(ambito, nombre),
     FOREIGN KEY (identificador_sismografo) REFERENCES Sismografo(identificador),
     FOREIGN KEY (nombre_empleado, apellido_empleado, mail_empleado) REFERENCES Empleado(nombre, apellido, mail)
