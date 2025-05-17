@@ -1,8 +1,9 @@
 import customtkinter as ctk
 import sys
+from gestor import GestorOrdenDeCierre
 
 class PantallaInicio(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, sesion):
         super().__init__(parent)
         self.controller = controller
 
@@ -67,13 +68,80 @@ class PantallaInicio(ctk.CTkFrame):
 
 
 class PantallaOrdenDeCierre(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, sesion):
         super().__init__(parent)
         self.controller = controller
 
-        label = ctk.CTkLabel(self, text="Pantalla Orden de Cierre", font=("Arial", 20))
-        label.pack(pady=20)
+        self.sesion = sesion
 
     def habilitarVentana(self):
-        # Aquí puedes habilitar la ventana o realizar otras acciones necesarias
-        pass
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        self.gestor = GestorOrdenDeCierre(self.sesion, self)
+
+    def mostrarOI(self, ordenes):
+        # Encabezado estilo Bootstrap
+        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
+        headerFrame.pack(fill="x", padx=10)
+        headerLabel = ctk.CTkLabel(
+            headerFrame,
+            text="Órdenes de Inspección",
+            font=("Arial", 24, "bold"),
+            text_color="white"
+        )
+        headerLabel.pack(pady=20)
+
+        # Cuerpo de la tabla
+        tableFrame = ctk.CTkFrame(self)
+        tableFrame.pack(fill="both", expand=True)
+
+        # Crear encabezados de tabla
+        columnas = ["Número de Orden", "Fecha de Finalizacion", "Nombre Estación", "Identificador Sismografo"]
+        for col_idx, col in enumerate(columnas):
+            label = ctk.CTkLabel(tableFrame, text=col, font=("Arial", 14, "bold"))
+            label.grid(row=0, column=col_idx, padx=10, pady=10)
+
+        # Llenar la tabla con datos
+        for i, orden in enumerate(ordenes):
+            ctk.CTkLabel(tableFrame, text=orden.get("numero", "")).grid(row=i+1, column=0, padx=10, pady=5)
+            ctk.CTkLabel(tableFrame, text=orden.get("fechaFinalizacion", "")).grid(row=i+1, column=1, padx=10, pady=5)
+            ctk.CTkLabel(tableFrame, text=orden.get("nombreEstacion", "")).grid(row=i+1, column=2, padx=10, pady=5)
+            ctk.CTkLabel(tableFrame, text=orden.get("sismografo", "")).grid(row=i+1, column=3, padx=10, pady=5)
+            # Botón para seleccionar esta orden
+            selectButton = ctk.CTkButton(
+                tableFrame,
+                text="Seleccionar",
+                command=lambda o=orden: self.seleccionarOI(o)
+            )
+            selectButton.grid(row=i+1, column=4, padx=10, pady=5)
+
+    def seleccionarOI(self, orden):
+        self.gestor.tomarOrden(orden)
+
+    def pedirObservacion(self):
+        # Limpia la pantalla
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        # Encabezado estilo Bootstrap
+        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
+        headerFrame.pack(fill="x", padx=10)
+        headerLabel = ctk.CTkLabel(
+            headerFrame,
+            text="Ingrese la observación de cierre:",
+            font=("Arial", 24, "bold"),
+            text_color="white"
+        )
+        headerLabel.pack(pady=20)
+
+        observacion_entry = ctk.CTkTextbox(self, width=400, height=100)
+        observacion_entry.pack(pady=10)
+
+        def guardar_observacion():
+            observacion = observacion_entry.get("1.0", "end").strip()
+            self.gestor.tomarObservacion(observacion)
+            # Puedes mostrar un mensaje de éxito o volver a otra pantalla
+
+        guardar_btn = ctk.CTkButton(self, text="Guardar", command=guardar_observacion)
+        guardar_btn.pack(pady=20)

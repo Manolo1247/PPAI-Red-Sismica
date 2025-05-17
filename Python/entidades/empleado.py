@@ -8,6 +8,15 @@ class Empleado():
         self.telefono = telefono
         self.rol = rol
 
+    def __eq__(self, other):
+        if not isinstance(other, Empleado):
+            return False
+        return (
+            self.nombre == other.nombre and
+            self.apellido == other.apellido and
+            self.mail == other.mail
+        )
+    
     def getMail(self):
         return self.mail
     

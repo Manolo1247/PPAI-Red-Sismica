@@ -8,4 +8,3 @@ class Usuario():
 
     def getEmpleado(self):
         return self.empleado
-        

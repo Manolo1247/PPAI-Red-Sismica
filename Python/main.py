@@ -1,14 +1,19 @@
 import customtkinter as ctk
 from pantallas import PantallaInicio, PantallaOrdenDeCierre
 
+from entidades.sesion import Sesion
+from entidades.usuario import Usuario
+from entidades.empleado import Empleado
+from entidades.rol import Rol
+
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
 class Pantalla(ctk.CTk):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, sesion, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.title("Inicio")
-        self.geometry("600x400")
+        self.geometry("800x600")
 
         # Contenedor principal con fondo blanco
         container = ctk.CTkFrame(self, fg_color="white")
@@ -21,7 +26,7 @@ class Pantalla(ctk.CTk):
 
         # Crear e inicializar cada frame
         for F in (PantallaInicio, PantallaOrdenDeCierre):
-            frame = F(container, self)
+            frame = F(container, self, sesion)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky=ctk.NSEW)
 
@@ -36,5 +41,18 @@ class Pantalla(ctk.CTk):
 
 
 if __name__ == "__main__":
-    app = Pantalla()
+    sesion = Sesion(
+        Usuario(
+            "anam",
+            "insp321",
+            Empleado(
+                "Ana",
+                "Martínez",
+                "ana.martinez@mail.com",
+                "4444444444",
+                Rol("Responsable de Inspeccion", "Coordina y realiza inspecciones de estaciones y equipos.")
+            )
+        )
+    )
+    app = Pantalla(sesion)
     app.mainloop()

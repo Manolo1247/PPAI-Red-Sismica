@@ -13,4 +13,5 @@ class Sismografo:
         self.estacionSismologica = estacionSismologica
         self.cambioEstado = cambioEstado
 
-
+    def getId(self):
+        return self.identificador
