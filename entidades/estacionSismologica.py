@@ -1,7 +1,12 @@
 import sqlite3
 from RUTAS.rutas import ARCHIVO_BD
 
-#from .sismografo import Sismografo
+from entidades.sismografo import Sismografo
+from entidades.estado import Estado
+from entidades.cambioEstado import CambioEstado
+from entidades.empleado import Empleado
+from entidades.rol import Rol
+
 class EstacionSismologica:
     def __init__(self, codigo, nombre, latitud, longitud, fechaSolicitudCertificacion, documentoCertificacion, numeroCertificacion):
         self.codigo = codigo
@@ -16,10 +21,46 @@ class EstacionSismologica:
         return self.nombre
     
     def getIdSismografo(self):
-        con = sqlite3.connect(ARCHIVO_BD)
-        cursor = con.cursor()
-        sql = "SELECT identificador FROM Sismografo WHERE codigo_estacion = ?"
-        cursor.execute(sql, (self.codigo,))
-        row = cursor.fetchone()
-        con.close()
-        return row[0] 
+        with sqlite3.connect(ARCHIVO_BD) as con:
+            cursor = con.cursor()
+            sql1 = (
+                'SELECT S.identificador, S.numero_serie, S.fecha_adquisicion '
+                'FROM Sismografo S '
+                'WHERE S.codigo_estacion = ?'
+            )
+            cursor.execute(sql1, (self.codigo,))
+            row = cursor.fetchone()
+
+        sismografo = Sismografo(row[0], row[1], row[2], None, None, None)
+        return sismografo.getId()
+
+    def fueraDeServicio(self, estadoFueraServicio, fechaHoraFin, empleado, motivos, comentarios):
+        with sqlite3.connect(ARCHIVO_BD) as con:
+            cursor = con.cursor()
+            sql = (
+                'SELECT S.identificador, S.numero_serie, S.fecha_adquisicion, S.ambito_estado_actual, S.nombre_estado_actual '
+                'FROM Sismografo S WHERE codigo_estacion = ?'
+            )
+            cursor.execute(sql, (self.codigo,))
+            rowSismografo = cursor.fetchone()
+            sql = (
+                'SELECT C.fecha_hora_inicio, C.fecha_hora_fin, C.ambito, C.nombre, '
+                'E.nombre, E.apellido, E.mail, E.telefono, R.nombre, R.descripcion '
+                'FROM CambioDeEstado C JOIN Empleado E ON C.nombre_empleado = E.nombre AND C.apellido_empleado = E.apellido AND C.mail_empleado = E.mail '
+                'JOIN Rol R ON E.rol = R.nombre '
+                'WHERE C.identificador_sismografo = ?'
+            )
+            cursor.execute(sql, (rowSismografo[0],))
+            rowCambioEstado = cursor.fetchall()
+
+        estadoSismografo = Estado(rowSismografo[3], rowSismografo[4])
+        cambiosEstado = []
+        for cambio in rowCambioEstado:
+            rol = Rol(cambio[8], cambio[9])
+            empleado = Empleado(cambio[4], cambio[5], cambio[6], cambio[7], rol)
+            estadoCE = Estado(cambio[2], cambio[3])
+            cambiosEstado.append(CambioEstado(cambio[0], cambio[1], empleado, estadoCE, []))
+
+        sismografo = Sismografo(rowSismografo[0], rowSismografo[1], rowSismografo[2], estadoSismografo, self, cambiosEstado)
+        sismografo.fueraDeServicio(estadoFueraServicio, fechaHoraFin, empleado, motivos, comentarios)
+

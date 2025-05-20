@@ -73,6 +73,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.controller = controller
 
         self.sesion = sesion
+        self.motivosGrilla = []
 
     def habilitarVentana(self):
         for widget in self.winfo_children():
@@ -112,7 +113,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             selectButton = ctk.CTkButton(
                 tableFrame,
                 text="Seleccionar",
-                command=lambda o=orden: self.seleccionarOI(o)
+                command=lambda ordenSeleccionada=orden["orden"]: self.seleccionarOI(ordenSeleccionada)
             )
             selectButton.grid(row=i+1, column=4, padx=10, pady=5)
 
@@ -140,8 +141,142 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
 
         def guardar_observacion():
             observacion = observacion_entry.get("1.0", "end").strip()
-            self.gestor.tomarObservacion(observacion)
+            self.tomarObservacion(observacion)
             # Puedes mostrar un mensaje de éxito o volver a otra pantalla
 
-        guardar_btn = ctk.CTkButton(self, text="Guardar", command=guardar_observacion)
+        guardar_btn = ctk.CTkButton(
+            self,
+            text="Guardar",
+            command=guardar_observacion,
+            width=200,  
+            height=55,  
+            font=("Arial", 18, "bold")  
+        )
         guardar_btn.pack(pady=20)
+
+    def tomarObservacion(self, observacion):
+        self.gestor.tomarObservacion(observacion)
+
+    def mostrarMFS(self, motivos):
+        self.motivosGrilla = motivos
+        # Limpia la pantalla
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        # Encabezado estilo Bootstrap
+        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
+        headerFrame.pack(fill="x", padx=10)
+        headerLabel = ctk.CTkLabel(
+            headerFrame,
+            text="Motivos de Cierre",
+            font=("Arial", 24, "bold"),
+            text_color="white"
+        )
+        headerLabel.pack(pady=20)
+
+        # Cuerpo de la tabla
+        tableFrame = ctk.CTkFrame(self)
+        tableFrame.pack(fill="both", expand=True)
+
+        # Crear encabezados de tabla
+        columnas = ["Descripción", "Seleccionar"]
+        for col_idx, col in enumerate(columnas):
+            label = ctk.CTkLabel(tableFrame, text=col, font=("Arial", 14, "bold"))
+            label.grid(row=0, column=col_idx, padx=10, pady=10)
+
+        # Llenar la tabla con datos, cada motivo tiene un botón "Seleccionar"
+        for i, motivo in enumerate(motivos):
+            ctk.CTkLabel(tableFrame, text=getattr(motivo, "getDescripcion", lambda: str(motivo))()).grid(row=i+1, column=0, padx=10, pady=5)
+            selectButton = ctk.CTkButton(
+                tableFrame,
+                text="Seleccionar",
+                command=lambda m=motivo: self.tomarMFS(m)
+            )
+            selectButton.grid(row=i+1, column=1, padx=10, pady=5)
+
+    def tomarMFS(self, motivo):
+        # Limpia la pantalla y muestra campo para comentario del motivo seleccionado
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        label = ctk.CTkLabel(
+            self,
+            text=f"Ingrese un comentario para: {getattr(motivo, 'getDescripcion', lambda: str(motivo))()}",
+            font=("Arial", 18, "bold"),
+            text_color="#0d6efd"
+        )
+        label.pack(pady=20)
+
+        comentario_entry = ctk.CTkTextbox(self, width=400, height=100)
+        comentario_entry.pack(pady=10)
+
+        def tomarComentario():
+            comentario = comentario_entry.get("1.0", "end").strip()
+            # Elimina el motivo de la grilla antes de pasar al gestor
+            self.motivosGrilla.remove(motivo)
+            self.tomarComentario(motivo, comentario)
+
+        guardar_btn = ctk.CTkButton(
+            self,
+            text="Guardar Comentario",
+            command=tomarComentario,
+            width=200,  
+            height=55,  
+            font=("Arial", 18, "bold")  
+        )
+        guardar_btn.pack(pady=20)
+
+    def tomarComentario(self, motivo, comentario):
+        self.gestor.tomarMotivoYComentario(motivo, comentario)
+
+    def pedirConfirmacion(self):
+        # Limpia la pantalla
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        # Encabezado estilo Bootstrap
+        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
+        headerFrame.pack(fill="x", padx=10)
+        headerLabel = ctk.CTkLabel(
+            headerFrame,
+            text="Motivos de Cierre",
+            font=("Arial", 24, "bold"),
+            text_color="white"
+        )
+        headerLabel.pack(pady=20)
+
+        # Cuerpo de la tabla
+        tableFrame = ctk.CTkFrame(self)
+        tableFrame.pack(fill="both", expand=True)
+
+        # Crear encabezados de tabla
+        columnas = ["Descripción", "Seleccionar"]
+        for col_idx, col in enumerate(columnas):
+            label = ctk.CTkLabel(tableFrame, text=col, font=("Arial", 14, "bold"))
+            label.grid(row=0, column=col_idx, padx=10, pady=10)
+
+        # Llenar la tabla con datos, cada motivo tiene un botón "Seleccionar"
+        for i, motivo in enumerate(self.motivosGrilla):
+            ctk.CTkLabel(tableFrame, text=getattr(motivo, "getDescripcion", lambda: str(motivo))()).grid(row=i+1, column=0, padx=10, pady=5)
+            selectButton = ctk.CTkButton(
+                tableFrame,
+                text="Seleccionar",
+                command=lambda m=motivo: self.tomarMFS(m)
+            )
+            selectButton.grid(row=i+1, column=1, padx=10, pady=5)
+
+        # Botón de confirmación
+        confirmar_btn = ctk.CTkButton(
+                self,
+                text="Confirmar",
+                font=("Arial", 18, "bold"),
+                fg_color="#198754",  # Verde Bootstrap
+                hover_color="#157347",  # Verde más oscuro al pasar el mouse
+                width=200,
+                height=50,
+                command=self.gestor.confirmar
+            )
+        confirmar_btn.pack(pady=30)
+
+
+

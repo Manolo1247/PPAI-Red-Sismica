@@ -1,6 +1,6 @@
 from .motivoTipo import MotivoTipo
 
 class MotivoFueraServicio:
-    def __init__(self, comentario, motivoTipo: MotivoTipo):
+    def __init__(self, comentario, motivoTipo):
         self.comentario = comentario
         self.motivoTipo = motivoTipo

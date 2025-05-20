@@ -1,3 +1,6 @@
+import sqlite3
+from RUTAS.rutas import ARCHIVO_BD
+
 from .estado import Estado
 from .empleado import Empleado
 from .estacionSismologica import EstacionSismologica
@@ -30,3 +33,19 @@ class OrdenDeInspeccion:
     
     def getSismografo(self):
         return self.estacion.getIdSismografo()
+    
+    def cerrar(self, fechaHora, estadoFueraDeServicio, observacion):
+        self.fechaHoraCierre = fechaHora
+
+        with sqlite3.connect(ARCHIVO_BD) as con:
+            cursor = con.cursor()
+            sql1 = (
+                'UPDATE OrdenDeInspeccion '
+                'SET fecha_hora_cierre = ?, ambito = ?, nombre = ?, observacion_cierre = ? '
+                'WHERE numero = ?'
+            )
+            cursor.execute(sql1, (self.fechaHoraCierre, estadoFueraDeServicio.ambito, estadoFueraDeServicio.nombre, observacion, self.numero))
+            con.commit()
+
+    def fueraDeServicio(self, estadoFueraServicio, motivos, comentarios):
+        self.estacion.fueraDeServicio(estadoFueraServicio, self.fechaHoraCierre, self.empleado, motivos, comentarios)

@@ -51,10 +51,11 @@ CREATE TABLE IF NOT EXISTS MotivoFueraServicio (
     fecha_hora_inicio DATETIME,
     ambito TEXT,
     nombre TEXT,
+	id_sismografo TEXT,
     motivo_tipo TEXT,
     comentario TEXT,
     PRIMARY KEY (fecha_hora_inicio, ambito, nombre, motivo_tipo),
-    FOREIGN KEY (fecha_hora_inicio, ambito, nombre) REFERENCES CambioDeEstado(fecha_hora_inicio, ambito, nombre),
+    FOREIGN KEY (fecha_hora_inicio, ambito, nombre, id_sismografo) REFERENCES CambioDeEstado(fecha_hora_inicio, ambito, nombre, identificador_sismografo),
     FOREIGN KEY (motivo_tipo) REFERENCES MotivoTipo(descripcion)
 );
 

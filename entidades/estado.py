@@ -5,3 +5,9 @@ class Estado:
 
     def estaRealizada(self):
         return self.nombre == "Completamente Realizada"
+    
+    def esAmbitoSismografo(self):
+        return self.ambito == "Sismografo"
+    
+    def esFueraDeServicio(self):
+        return self.nombre == "Fuera de Servicio"
