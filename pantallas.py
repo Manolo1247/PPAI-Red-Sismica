@@ -139,8 +139,15 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         observacion_entry = ctk.CTkTextbox(self, width=400, height=100)
         observacion_entry.pack(pady=10)
 
+        mensaje_error = ctk.CTkLabel(self, text="", text_color="red", font=("Arial", 14, "bold"))
+        mensaje_error.pack(pady=5)
+
         def guardar_observacion():
             observacion = observacion_entry.get("1.0", "end").strip()
+            if not observacion:
+                mensaje_error.configure(text="Debe ingresar una observación.")
+                return
+            mensaje_error.configure(text="")
             self.tomarObservacion(observacion)
             # Puedes mostrar un mensaje de éxito o volver a otra pantalla
 
@@ -210,8 +217,15 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         comentario_entry = ctk.CTkTextbox(self, width=400, height=100)
         comentario_entry.pack(pady=10)
 
-        def tomarComentario():
+        mensaje_error = ctk.CTkLabel(self, text="", text_color="red", font=("Arial", 14, "bold"))
+        mensaje_error.pack(pady=5)
+
+        def guardarComentario():
             comentario = comentario_entry.get("1.0", "end").strip()
+            if not comentario:
+                mensaje_error.configure(text="Debe ingresar un comentario.")
+                return
+            mensaje_error.configure(text="")
             # Elimina el motivo de la grilla antes de pasar al gestor
             self.motivosGrilla.remove(motivo)
             self.tomarComentario(motivo, comentario)
@@ -219,7 +233,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         guardar_btn = ctk.CTkButton(
             self,
             text="Guardar Comentario",
-            command=tomarComentario,
+            command=guardarComentario,
             width=200,  
             height=55,  
             font=("Arial", 18, "bold")  
@@ -266,6 +280,28 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             selectButton.grid(row=i+1, column=1, padx=10, pady=5)
 
         # Botón de confirmación
+        def confirmar_y_mostrar_espera():
+            # Limpiar widgets
+            for widget in self.winfo_children():
+                widget.destroy()
+            # Mostrar mensaje de espera
+            espera_frame = ctk.CTkFrame(self)
+            espera_frame.pack(expand=True)
+            engranaje_label = ctk.CTkLabel(
+                espera_frame,
+                text="🔄",
+                font=("Arial", 48)
+            )
+            engranaje_label.pack(pady=10)
+            mensaje_label = ctk.CTkLabel(
+                espera_frame,
+                text="Por favor, espere...",
+                font=("Arial", 20, "bold")
+            )
+            mensaje_label.pack(pady=10)
+            # Llamar a la lógica real después de actualizar la UI
+            self.after(100, self.gestor.confirmar)
+
         confirmar_btn = ctk.CTkButton(
                 self,
                 text="Confirmar",
@@ -274,7 +310,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
                 hover_color="#157347",  # Verde más oscuro al pasar el mouse
                 width=200,
                 height=50,
-                command=self.gestor.confirmar
+                command=confirmar_y_mostrar_espera
             )
         confirmar_btn.pack(pady=30)
 

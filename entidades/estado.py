@@ -11,3 +11,9 @@ class Estado:
     
     def esFueraDeServicio(self):
         return self.nombre == "Fuera de Servicio"
+    
+    def esAmbitoOI(self):
+        return self.ambito == "Orden de Inspeccion"
+    
+    def esCerrada(self):
+        return self.nombre == "Cerrada"

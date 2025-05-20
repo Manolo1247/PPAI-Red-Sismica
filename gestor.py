@@ -23,7 +23,9 @@ class GestorOrdenDeCierre():
         self.motivosSeleccionados = []
         self.comentarios = []
         self.estadoFueraDeServicio = None
+        self.estadoCerrada = None
         self.fechaHoraActual = None
+        self.mailsResponsableReparaciones = []
 
         self.buscarEmpleadoRI()
 
@@ -102,9 +104,9 @@ class GestorOrdenDeCierre():
         self.pantalla.pedirConfirmacion()
 
     def confirmar(self):
-        self.buscarEstadoFS()
+        self.buscarEstadoFSYCerrada()
 
-    def buscarEstadoFS(self):
+    def buscarEstadoFSYCerrada(self):
         with sqlite3.connect(ARCHIVO_BD) as con:
             cursor = con.cursor()
             sql = 'SELECT ambito, nombre FROM Estado'
@@ -115,17 +117,36 @@ class GestorOrdenDeCierre():
             estado = Estado(fila[0], fila[1])
             if estado.esAmbitoSismografo() and estado.esFueraDeServicio():
                 self.estadoFueraDeServicio = estado
-                break
+            if estado.esAmbitoOI() and estado.esCerrada():
+                self.estadoCerrada = estado
 
         self.getFechaHoraActual()
 
     def getFechaHoraActual(self):
         self.fechaHoraActual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        self.ordenSeleccionada.cerrar(self.fechaHoraActual, self.estadoFueraDeServicio, self.observacion)
+        self.ordenSeleccionada.cerrar(self.fechaHoraActual, self.estadoCerrada, self.observacion)
         self.ordenSeleccionada.fueraDeServicio(self.estadoFueraDeServicio, self.motivosSeleccionados, self.comentarios)
 
         self.getMailResponsableReparaciones()
 
     def getMailResponsableReparaciones(self):
+        with sqlite3.connect(ARCHIVO_BD) as con:
+            cursor = con.cursor()
+            sql = (
+                'SELECT E.nombre, E.apellido, E.mail, E.telefono, R.nombre, R.descripcion '
+                'FROM Empleado E JOIN Rol R ON E.rol = R.nombre '
+            )
+            cursor.execute(sql)
+            filas = cursor.fetchall()
+
+        for fila in filas:
+            rol = Rol(fila[4], fila[5])
+            empleado = Empleado(fila[0], fila[1], fila[2], fila[3], rol)
+            if empleado.esResponsableReparacion():
+                self.mailsResponsableReparaciones.append(empleado.getMail())
+
+        self.enviarNotificacionMail()
+
+    def enviarNotificacionMail(self):
         pass

@@ -16,9 +16,9 @@ class Empleado():
             self.apellido == other.apellido and
             self.mail == other.mail
         )
-    
-    def getMail(self):
-        return self.mail
-    
+       
     def esResponsableReparacion(self):
         return self.rol.esResponsableReparacion()
+
+    def getMail(self):
+        return self.mail
