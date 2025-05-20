@@ -4,7 +4,8 @@
 INSERT INTO Rol (nombre, descripcion) VALUES ('Administrador de Red', 'Gestiona la red y la infraestructura tecnológica de la red sísmica.');
 INSERT INTO Rol (nombre, descripcion) VALUES ('Encargado de Instalaciones', 'Supervisa y ejecuta la instalación y mantenimiento de equipos.');
 INSERT INTO Rol (nombre, descripcion) VALUES ('Analista en Sismos', 'Analiza los datos sísmicos y genera reportes técnicos.');
-INSERT INTO Rol (nombre, descripcion) VALUES ('Rensponsable de Inspecciones', 'Coordina y realiza inspecciones de estaciones y equipos.');
+INSERT INTO Rol (nombre, descripcion) VALUES ('Responsable de Inspecciones', 'Coordina y realiza inspecciones de estaciones y equipos.');
+INSERT INTO Rol (nombre, descripcion) VALUES ('Responsable de Reparacion', 'Gestiona y coordina las reparaciones de equipos y estaciones.');
 
 -- Insertar estados para Orden de Inspeccion
 INSERT INTO Estado (ambito, nombre) VALUES ('Orden de Inspeccion', 'Pendiente de Realizacion');
@@ -35,7 +36,8 @@ INSERT INTO MotivoTipo (descripcion) VALUES ('Fallo en fuente de alimentación')
 INSERT INTO Empleado (nombre, apellido, mail, telefono, rol) VALUES ('Juan', 'Pérez', 'juan.perez@mail.com', '1111111111', 'Administrador de Red');
 INSERT INTO Empleado (nombre, apellido, mail, telefono, rol) VALUES ('María', 'Gómez', 'maria.gomez@mail.com', '2222222222', 'Encargado de Instalaciones');
 INSERT INTO Empleado (nombre, apellido, mail, telefono, rol) VALUES ('Carlos', 'López', 'carlos.lopez@mail.com', '3333333333', 'Analista en Sismos');
-INSERT INTO Empleado (nombre, apellido, mail, telefono, rol) VALUES ('Ana', 'Martínez', 'ana.martinez@mail.com', '4444444444', 'Rensponsable de Inspecciones');
+INSERT INTO Empleado (nombre, apellido, mail, telefono, rol) VALUES ('Ana', 'Martínez', 'ana.martinez@mail.com', '4444444444', 'Responsable de Inspecciones');
+
 
 -- Insertar usuarios uno para cada empleado
 INSERT INTO Usuario (nombre, contraseña, nombre_empleado, apellido_empleado, mail_empleado) VALUES ('juanp', 'admin123', 'Juan', 'Pérez', 'juan.perez@mail.com');
