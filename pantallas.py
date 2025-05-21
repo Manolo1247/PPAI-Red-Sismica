@@ -77,8 +77,11 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
 
     def habilitarVentana(self):
         self.gestor = GestorOrdenDeCierre(self.sesion, self)
-
+    
     def mostrarOI(self, ordenes):
+        # Limpiar la pantalla antes de cargar nuevos widgets para el correcto funcionamiento del botón volver
+        for widget in self.winfo_children():
+            widget.destroy()
         # Encabezado estilo Bootstrap
         headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
         headerFrame.pack(fill="x", padx=10)
@@ -113,6 +116,21 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
                 command=lambda ordenSeleccionada=orden["orden"]: self.seleccionarOI(ordenSeleccionada)
             )
             selectButton.grid(row=i+1, column=4, padx=10, pady=5)
+
+            volver_btn = ctk.CTkButton(
+            self,
+            text="Volver",
+            fg_color="#dc3545",  # Rojo Bootstrap
+            hover_color="#c82333",  # Hover más oscuro
+            command=self.volverInicio,
+            width=200,
+            height=55,
+            font=("Arial", 18, "bold")
+        )
+        volver_btn.pack(pady=10)
+
+    def volverInicio(self):
+        self.controller.showFrame(PantallaInicio)
 
     def seleccionarOI(self, orden):
         self.gestor.tomarOrden(orden)
@@ -157,6 +175,22 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             font=("Arial", 18, "bold")  
         )
         guardar_btn.pack(pady=20)
+
+        volver_btn = ctk.CTkButton(
+            self,
+            text="Volver",
+            fg_color="#dc3545",  # Rojo Bootstrap
+            hover_color="#c82333",  # Hover más oscuro
+            command=self.volver,
+            width=200,
+            height=55,
+            font=("Arial", 18, "bold")
+        )
+        volver_btn.pack(pady=10)
+
+    def volver(self):
+        self.controller.showFrame(PantallaOrdenDeCierre)
+
 
     def tomarObservacion(self, observacion):
         self.gestor.tomarObservacion(observacion)
