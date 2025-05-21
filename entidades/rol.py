@@ -4,4 +4,4 @@ class Rol():
         self.descripcion = descripcion
 
     def esResponsableReparacion(self):
-        return self.nombre == "Responsable de Reparación"
+        return self.nombre == "Responsable de Reparacion"
