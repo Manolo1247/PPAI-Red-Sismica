@@ -17,13 +17,8 @@ class Sismografo:
     def getId(self):
         return self.identificador
 
-    def fueraDeServicio(self, estadoFueraServicio, fechaHoraFin, empleado, motivos, comentarios):
-        for CE in self.cambiosEstado:
-            if CE.esActual():
-                CE.setFechaHoraFin(fechaHoraFin, self.identificador)    # Actual:CambioEstado
-                break
-        # Setear el estado actual del sismografo
-        self.estadoActual = estadoFueraServicio
+    def setEstadoActual(self, estado):
+        self.estadoActual = estado
         with sqlite3.connect(ARCHIVO_BD) as con:
             cursor = con.cursor()
             sql = (
@@ -34,5 +29,13 @@ class Sismografo:
             cursor.execute(sql, (self.estadoActual.ambito, self.estadoActual.nombre, self.identificador))
             con.commit()
 
+    def fueraDeServicio(self, estadoFueraServicio, fechaHoraFin, empleado, motivos, comentarios):
+        for CE in self.cambiosEstado:
+            if CE.esActual():
+                CE.setFechaHoraFin(fechaHoraFin, self.identificador)    # Actual:CambioEstado
+                break
+        # Setear el estado actual del sismografo
+        self.setEstadoActual(estadoFueraServicio)
+        
         # Nuevo:CambioEstado
         cambioEstado = CambioEstado(fechaHoraFin, None, empleado, estadoFueraServicio, [], motivos=motivos, comentarios=comentarios, idSismografo=self.identificador)

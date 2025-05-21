@@ -33,7 +33,7 @@ class CambioEstado:
             cursor.execute(sql1, (self.fechaHoraFin, idSismografo, self.fechaHoraInicio, self.estado.ambito, self.estado.nombre))
             con.commit()
 
-    def crearMotivos(self, motivos, comentarios, idSismografo):      
+    def crearMotivos(self, motivos, comentarios, idSismografo):              
         with sqlite3.connect(ARCHIVO_BD) as con:
             cursor = con.cursor()
             # Guardar Cambio de Estado
@@ -50,6 +50,7 @@ class CambioEstado:
                 motivo = motivos[i]
                 comentario = comentarios[i]
                 motivoFueraServicio = MotivoFueraServicio(comentario, MotivoTipo(motivo))
+                
                 self.motivoFueraServicio.append(motivoFueraServicio)
 
                 sql_MFS = (

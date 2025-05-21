@@ -104,6 +104,10 @@ class GestorOrdenDeCierre():
         self.pantalla.pedirConfirmacion()
 
     def confirmar(self):
+        self.validarObservacionesYmotivos()
+
+    def validarObservacionesYmotivos(self):
+
         self.buscarEstadoFSYCerrada()
 
     def buscarEstadoFSYCerrada(self):

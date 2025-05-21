@@ -34,8 +34,19 @@ class OrdenDeInspeccion:
     def getSismografo(self):
         return self.estacion.getIdSismografo()
     
-    def cerrar(self, fechaHora, estadoFueraDeServicio, observacion):
-        self.fechaHoraCierre = fechaHora
+    def setEstado(self, estado):
+        self.estado = estado
+
+    def setFechaHoraCierre(self, fechaHoraCierre):
+        self.fechaHoraCierre = fechaHoraCierre
+
+    def setObservacionCierre(self, observacion):
+        self.observacion_cierre = observacion
+
+    def cerrar(self, fechaHora, estadoCerrada, observacion):
+        self.setEstado(estadoCerrada)
+        self.setFechaHoraCierre(fechaHora)
+        self.setObservacionCierre(observacion)
 
         with sqlite3.connect(ARCHIVO_BD) as con:
             cursor = con.cursor()
@@ -44,7 +55,7 @@ class OrdenDeInspeccion:
                 'SET fecha_hora_cierre = ?, ambito = ?, nombre = ?, observacion_cierre = ? '
                 'WHERE numero = ?'
             )
-            cursor.execute(sql1, (self.fechaHoraCierre, estadoFueraDeServicio.ambito, estadoFueraDeServicio.nombre, observacion, self.numero))
+            cursor.execute(sql1, (self.fechaHoraCierre, estadoCerrada.ambito, estadoCerrada.nombre, observacion, self.numero))
             con.commit()
 
     def fueraDeServicio(self, estadoFueraServicio, motivos, comentarios):

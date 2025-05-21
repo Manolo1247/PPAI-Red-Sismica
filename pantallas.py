@@ -6,7 +6,7 @@ class PantallaInicio(ctk.CTkFrame):
     def __init__(self, parent, controller, sesion):
         super().__init__(parent)
         self.controller = controller
-
+    
         # Encabezado estilo Bootstrap
         headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)  # Azul de Bootstrap
         headerFrame.pack(fill="x", padx=10)  # Padding para los bordes
@@ -76,9 +76,6 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.motivosGrilla = []
 
     def habilitarVentana(self):
-        for widget in self.winfo_children():
-            widget.destroy()
-
         self.gestor = GestorOrdenDeCierre(self.sesion, self)
 
     def mostrarOI(self, ordenes):
