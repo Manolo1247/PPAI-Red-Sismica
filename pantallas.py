@@ -393,6 +393,6 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         cancelar_btn.pack(side="left", padx=10)
 
     def cancelar(self):
-        self.gestor.finCU()
+        self.gestor.finCU(force=True)
         self.controller.showFrame(PantallaInicio)
 

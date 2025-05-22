@@ -159,5 +159,5 @@ class GestorOrdenDeCierre():
 
 
 
-    def finCU(self):
+    def finCU(self, force=False):
         del self
