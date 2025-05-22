@@ -190,6 +190,7 @@ class GestorOrdenDeCierre():
         self.finCU()
 
     def finCU(self, cancelar=False):
-        if not cancelar:
-            self.pantalla.cancelar()
-        del self
+        #if not cancelar:
+            #self.pantalla.cerrar()
+        #del self
+        self.pantalla.cerrar()

@@ -68,7 +68,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             text="Cancelar",
             fg_color="#dc3545",  # Rojo Bootstrap
             hover_color="#c82333",  # Hover más oscuro
-            command=self.cancelar,
+            command=self.cerrar,
             width=200,
             height=55,
             font=("Arial", 18, "bold")
@@ -128,7 +128,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             text="Cancelar",
             fg_color="#dc3545",
             hover_color="#c82333",
-            command=self.cancelar,
+            command=self.cerrar,
             width=200,
             height=55,
             font=("Arial", 18, "bold")
@@ -200,7 +200,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             text="Cancelar",
             fg_color="#dc3545",  # Rojo Bootstrap
             hover_color="#c82333",  # Hover más oscuro
-            command=self.cancelar,
+            command=self.cerrar,
             width=200,
             height=55,
             font=("Arial", 18, "bold")
@@ -250,7 +250,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             text="Cancelar",
             fg_color="#dc3545",  # Rojo Bootstrap
             hover_color="#c82333",  # Hover más oscuro
-            command=self.cancelar,
+            command=self.cerrar,
             width=200,
             height=55,
             font=("Arial", 18, "bold")
@@ -306,7 +306,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             text="Cancelar",
             fg_color="#dc3545",  # Rojo Bootstrap
             hover_color="#c82333",  # Hover más oscuro
-            command=self.cancelar,
+            command=self.cerrar,
             width=200,
             height=55,
             font=("Arial", 18, "bold")
@@ -397,15 +397,15 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             text="Cancelar",
             fg_color="#dc3545",
             hover_color="#c82333",
-            command=self.cancelar,
+            command=self.cerrar,
             width=200,
             height=55,
             font=("Arial", 18, "bold")
         )
         cancelar_btn.pack(side="left", padx=10)
 
-    def cancelar(self):
+    def cerrar(self):
         from fabricacion_pura.pantallaInicio import PantallaInicio
-        self.gestor.finCU(cancelar=True)
+        #self.gestor.finCU(cancelar=True)
         self.controller.showFrame(PantallaInicio)
 
