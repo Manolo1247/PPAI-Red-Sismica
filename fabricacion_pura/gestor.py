@@ -11,6 +11,10 @@ from entidades.estacionSismologica import EstacionSismologica
 from entidades.estado import Estado
 from entidades.motivoTipo import MotivoTipo
 
+from fabricacion_pura.interfazMail import InterfazMail
+from fabricacion_pura.pantallaCCRS import PantallaCCRS
+
+
 class GestorOrdenDeCierre():
     def __init__(self, sesion, pantalla):
         self.sesion = sesion
@@ -108,7 +112,8 @@ class GestorOrdenDeCierre():
         self.validarObservacionesYmotivos()
 
     def validarObservacionesYmotivos(self):
-
+        if len(self.observacion) == 0 or (len(self.motivosSeleccionados) == 0 and len(self.comentarios) == 0):
+            self.finCU()
         self.buscarEstadoFSYCerrada()
 
     def buscarEstadoFSYCerrada(self):
@@ -154,12 +159,28 @@ class GestorOrdenDeCierre():
         self.enviarNotificacionMail()
 
     def enviarNotificacionMail(self):
-        # Aquí iría la lógica de notificación por mail
+        idSismografo = self.ordenSeleccionada.getSismografo()
+        asunto = f"Orden de Inspeccion Cerrada"
+        mensaje = f"La orden de inspección para el sismógrafo {idSismografo} ha sido cerrada.\n" \
+                    f"El sismografo ahora se encuentra {self.estadoFueraDeServicio.getNombre()}\n" \
+                    f"Fecha y hora de cierre: {self.fechaHoraActual}\n" \
+                    f"Motivos:\n"
+        
+        for i in range(len(self.motivosSeleccionados)):
+            motivo = MotivoTipo(self.motivosSeleccionados[i])
+            comentario = self.comentarios[i]
+            mensaje += f"\t{motivo.getDescripcion()} || Comentario: {comentario}\n"
+
+        for mail in self.mailsResponsableReparaciones:
+            InterfazMail.enviarMail(mail, asunto, mensaje)
+
         self.publicarMonitores()
 
     def publicarMonitores(self):
         # Aquí iría la lógica de publicación de monitores
         self.finCU()
 
-    def finCU(self, force=False):
+    def finCU(self, cancelar=False):
+        if not cancelar:
+            self.pantalla.cancelar()
         del self

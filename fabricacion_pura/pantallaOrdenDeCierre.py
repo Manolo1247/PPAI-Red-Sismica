@@ -328,8 +328,8 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         cancelar_btn.pack(side="left", padx=10)
 
     def cancelar(self):
-        from fabricacion_pura.pantallaInicio import PantallaInicio  # Importa aquí, solo cuando se usa
-        self.gestor.finCU(force=True)
+        from fabricacion_pura.pantallaInicio import PantallaInicio
+        self.gestor.finCU(cancelar=True)
         self.controller.showFrame(PantallaInicio)
 
 
