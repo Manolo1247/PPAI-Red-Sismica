@@ -12,9 +12,9 @@ class CambioEstado:
         self.fechaHoraFin = fechaHoraFin
         self.empleado = empleado
         self.estado = estado
-        self.motivoFueraServicio = motivoFueraServicio
+        self.motivosFueraServicio = motivoFueraServicio
 
-        if self.estado.esFueraDeServicio() and len(self.motivoFueraServicio) == 0:
+        if self.estado.esFueraDeServicio() and len(self.motivosFueraServicio) == 0:
             self.crearMotivos(motivos, comentarios, idSismografo)
 
     def esActual(self):
@@ -34,9 +34,17 @@ class CambioEstado:
             con.commit()
 
     def crearMotivos(self, motivos, comentarios, idSismografo):              
+        n = len(motivos)
+        for i in range(n):
+            motivo = motivos[i]
+            comentario = comentarios[i]
+            motivoFueraServicio = MotivoFueraServicio(comentario, MotivoTipo(motivo))
+            
+            self.motivosFueraServicio.append(motivoFueraServicio)
+
+    def guardar(self, idSismografo):
         with sqlite3.connect(ARCHIVO_BD) as con:
             cursor = con.cursor()
-            # Guardar Cambio de Estado
             sql_CE = (
                 'INSERT INTO CambioDeEstado (fecha_hora_inicio, ambito, nombre, identificador_sismografo, nombre_empleado, apellido_empleado, mail_empleado) '
                 'VALUES (?, ?, ?, ?, ?, ?, ?)'
@@ -44,15 +52,7 @@ class CambioEstado:
             cursor.execute(sql_CE, (self.fechaHoraInicio, self.estado.ambito, self.estado.nombre, idSismografo, self.empleado.nombre, self.empleado.apellido, self.empleado.mail))
             con.commit()
 
-            # Guardar Motivos Fuera de Servicio
-            n = len(motivos)
-            for i in range(n):
-                motivo = motivos[i]
-                comentario = comentarios[i]
-                motivoFueraServicio = MotivoFueraServicio(comentario, MotivoTipo(motivo))
-                
-                self.motivoFueraServicio.append(motivoFueraServicio)
-
+            for motivoFueraServicio in self.motivosFueraServicio:
                 sql_MFS = (
                 'INSERT INTO MotivoFueraServicio (fecha_hora_inicio, ambito, nombre, motivo_tipo, comentario, id_sismografo) '
                 'VALUES (?, ?, ?, ?, ?, ?)'

@@ -39,19 +39,28 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             label = ctk.CTkLabel(tableFrame, text=col, font=("Arial", 14, "bold"))
             label.grid(row=0, column=col_idx, padx=10, pady=10)
 
-        # Llenar la tabla con datos
-        for i, orden in enumerate(ordenes):
-            ctk.CTkLabel(tableFrame, text=orden.get("numero", "")).grid(row=i+1, column=0, padx=10, pady=5)
-            ctk.CTkLabel(tableFrame, text=orden.get("fechaFinalizacion", "")).grid(row=i+1, column=1, padx=10, pady=5)
-            ctk.CTkLabel(tableFrame, text=orden.get("nombreEstacion", "")).grid(row=i+1, column=2, padx=10, pady=5)
-            ctk.CTkLabel(tableFrame, text=orden.get("sismografo", "")).grid(row=i+1, column=3, padx=10, pady=5)
-            # Botón para seleccionar esta orden
-            selectButton = ctk.CTkButton(
+        if not ordenes:
+            sin_ordenes_label = ctk.CTkLabel(
                 tableFrame,
-                text="Seleccionar",
-                command=lambda ordenSeleccionada=orden["orden"]: self.seleccionarOI(ordenSeleccionada)
+                text="No se encontraron órdenes realizadas.",
+                font=("Arial", 16, "bold"),
+                text_color="red"
             )
-            selectButton.grid(row=i+1, column=4, padx=10, pady=5)
+            sin_ordenes_label.grid(row=1, column=0, columnspan=5, pady=30)
+        else:
+            # Llenar la tabla con datos
+            for i, orden in enumerate(ordenes):
+                ctk.CTkLabel(tableFrame, text=orden.get("numero", "")).grid(row=i+1, column=0, padx=10, pady=5)
+                ctk.CTkLabel(tableFrame, text=orden.get("fechaFinalizacion", "")).grid(row=i+1, column=1, padx=10, pady=5)
+                ctk.CTkLabel(tableFrame, text=orden.get("nombreEstacion", "")).grid(row=i+1, column=2, padx=10, pady=5)
+                ctk.CTkLabel(tableFrame, text=orden.get("sismografo", "")).grid(row=i+1, column=3, padx=10, pady=5)
+                # Botón para seleccionar esta orden
+                selectButton = ctk.CTkButton(
+                    tableFrame,
+                    text="Seleccionar",
+                    command=lambda ordenSeleccionada=orden["orden"]: self.seleccionarOI(ordenSeleccionada)
+                )
+                selectButton.grid(row=i+1, column=4, padx=10, pady=5)
 
         # Botón para cancelar CU
         cancelar_btn = ctk.CTkButton(
@@ -128,6 +137,75 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
 
     def tomarObservacion(self, observacion):
         self.gestor.tomarObservacion(observacion)
+
+    def actualizarSituacionSismografo(self, estadoEnLinea, estadoFueraDeServicio):
+        # Limpia la pantalla
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        # Encabezado estilo Bootstrap
+        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
+        headerFrame.pack(fill="x", padx=10)
+        headerLabel = ctk.CTkLabel(
+            headerFrame,
+            text="Situación del Sismógrafo",
+            font=("Arial", 24, "bold"),
+            text_color="white"
+        )
+        headerLabel.pack(pady=20)
+
+        # Frame para los estados y botones
+        estados_frame = ctk.CTkFrame(self, fg_color="transparent")
+        estados_frame.pack(pady=40)
+
+        # Estado En Línea
+        en_linea_label = ctk.CTkLabel(
+            estados_frame,
+            text=estadoEnLinea,
+            font=("Arial", 20, "bold"),
+            text_color="#198754"
+        )
+        en_linea_label.grid(row=0, column=0, padx=40, pady=10)
+        en_linea_btn = ctk.CTkButton(
+            estados_frame,
+            text="Seleccionar",
+            command=self.gestor.seleccionarEnLinea,
+            width=180,
+            height=45,
+            font=("Arial", 16, "bold")
+        )
+        en_linea_btn.grid(row=1, column=0, padx=40, pady=10)
+
+        # Estado Fuera de Servicio
+        fs_label = ctk.CTkLabel(
+            estados_frame,
+            text=estadoFueraDeServicio,
+            font=("Arial", 20, "bold"),
+            text_color="#dc3545"
+        )
+        fs_label.grid(row=0, column=1, padx=40, pady=10)
+        fs_btn = ctk.CTkButton(
+            estados_frame,
+            text="Seleccionar",
+            command=self.gestor.seleccionarFS,
+            width=180,
+            height=45,
+            font=("Arial", 16, "bold")
+        )
+        fs_btn.grid(row=1, column=1, padx=40, pady=10)
+
+        # Botón para cancelar CU
+        cancelar_btn = ctk.CTkButton(
+            self,
+            text="Cancelar",
+            fg_color="#dc3545",  # Rojo Bootstrap
+            hover_color="#c82333",  # Hover más oscuro
+            command=self.cancelar,
+            width=200,
+            height=55,
+            font=("Arial", 18, "bold")
+        )
+        cancelar_btn.pack(pady=10)
 
     def mostrarMFS(self, motivos):
         self.motivosGrilla = motivos
@@ -330,6 +408,4 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         from fabricacion_pura.pantallaInicio import PantallaInicio
         self.gestor.finCU(cancelar=True)
         self.controller.showFrame(PantallaInicio)
-
-
 

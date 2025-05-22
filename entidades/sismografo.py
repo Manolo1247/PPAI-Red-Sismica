@@ -39,3 +39,22 @@ class Sismografo:
         
         # Nuevo:CambioEstado
         cambioEstado = CambioEstado(fechaHoraFin, None, empleado, estadoFueraServicio, [], motivos=motivos, comentarios=comentarios, idSismografo=self.identificador)
+        self.cambiosEstado.append(cambioEstado)
+
+        # Guardar 
+        cambioEstado.guardar(self.identificador)
+
+    def enLinea(self, estadoEnLinea, fechaHoraFin, empleado):
+        for CE in self.cambiosEstado:
+            if CE.esActual():
+                CE.setFechaHoraFin(fechaHoraFin, self.identificador)    # Actual:CambioEstado
+                break
+        # Setear el estado actual del sismografo
+        self.setEstadoActual(estadoEnLinea)
+
+        # Nuevo:CambioEstado
+        cambioEstado = CambioEstado(fechaHoraFin, None, empleado, estadoEnLinea, [])
+        self.cambiosEstado.append(cambioEstado)
+        
+        # Guardar 
+        cambioEstado.guardar(self.identificador)

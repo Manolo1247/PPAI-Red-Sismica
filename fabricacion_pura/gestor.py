@@ -27,6 +27,7 @@ class GestorOrdenDeCierre():
         self.motivos = []
         self.motivosSeleccionados = []
         self.comentarios = []
+        self.estadoEnLinea = None
         self.estadoFueraDeServicio = None
         self.estadoCerrada = None
         self.fechaHoraActual = None
@@ -87,6 +88,30 @@ class GestorOrdenDeCierre():
 
     def tomarObservacion(self, observacion):
         self.observacion = observacion
+        self.buscarEstados()
+
+    def buscarEstados(self):
+        with sqlite3.connect(ARCHIVO_BD) as con:
+            cursor = con.cursor()
+            sql = 'SELECT ambito, nombre FROM Estado'
+            cursor.execute(sql)
+            filas = cursor.fetchall()
+
+        for fila in filas:
+            estado = Estado(fila[0], fila[1])
+            if estado.esAmbitoSismografo() and estado.esFueraDeServicio():
+                self.estadoFueraDeServicio = estado
+            elif estado.esAmbitoSismografo() and estado.esEnLinea():
+                self.estadoEnLinea = estado
+            elif estado.esAmbitoOI() and estado.esCerrada():
+                self.estadoCerrada = estado
+
+        self.pantalla.actualizarSituacionSismografo(self.estadoEnLinea.nombre, self.estadoFueraDeServicio.nombre)
+
+    def seleccionarEnLinea(self):
+        self.getFechaHoraActual()
+
+    def seleccionarFS(self):
         self.buscarMFS()
 
     def buscarMFS(self):
@@ -109,36 +134,19 @@ class GestorOrdenDeCierre():
         self.pantalla.pedirConfirmacion()
 
     def confirmar(self):
-        self.validarObservacionesYmotivos()
+        self.getFechaHoraActual(EnLinea=False)
 
-    def validarObservacionesYmotivos(self):
-        if len(self.observacion) == 0 or (len(self.motivosSeleccionados) == 0 and len(self.comentarios) == 0):
-            self.finCU()
-        self.buscarEstadoFSYCerrada()
-
-    def buscarEstadoFSYCerrada(self):
-        with sqlite3.connect(ARCHIVO_BD) as con:
-            cursor = con.cursor()
-            sql = 'SELECT ambito, nombre FROM Estado'
-            cursor.execute(sql)
-            filas = cursor.fetchall()
-
-        for fila in filas:
-            estado = Estado(fila[0], fila[1])
-            if estado.esAmbitoSismografo() and estado.esFueraDeServicio():
-                self.estadoFueraDeServicio = estado
-            if estado.esAmbitoOI() and estado.esCerrada():
-                self.estadoCerrada = estado
-
-        self.getFechaHoraActual()
-
-    def getFechaHoraActual(self):
+    def getFechaHoraActual(self, EnLinea=True):
         self.fechaHoraActual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         self.ordenSeleccionada.cerrar(self.fechaHoraActual, self.estadoCerrada, self.observacion)
-        self.ordenSeleccionada.fueraDeServicio(self.estadoFueraDeServicio, self.motivosSeleccionados, self.comentarios)
-
-        self.getMailResponsableReparaciones()
+        
+        if EnLinea:
+            self.ordenSeleccionada.enLinea(self.estadoEnLinea)
+            self.finCU()
+        else:
+            self.ordenSeleccionada.fueraDeServicio(self.estadoFueraDeServicio, self.motivosSeleccionados, self.comentarios)
+            self.getMailResponsableReparaciones()
 
     def getMailResponsableReparaciones(self):
         with sqlite3.connect(ARCHIVO_BD) as con:
@@ -162,7 +170,7 @@ class GestorOrdenDeCierre():
         idSismografo = self.ordenSeleccionada.getSismografo()
         asunto = f"Orden de Inspeccion Cerrada"
         mensaje = f"La orden de inspección para el sismógrafo {idSismografo} ha sido cerrada.\n" \
-                    f"El sismografo ahora se encuentra {self.estadoFueraDeServicio.getNombre()}\n" \
+                    f"El sismografo ahora se encuentra {self.estadoFueraDeServicio.nombre}\n" \
                     f"Fecha y hora de cierre: {self.fechaHoraActual}\n" \
                     f"Motivos:\n"
         

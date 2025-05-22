@@ -60,3 +60,6 @@ class OrdenDeInspeccion:
 
     def fueraDeServicio(self, estadoFueraServicio, motivos, comentarios):
         self.estacion.fueraDeServicio(estadoFueraServicio, self.fechaHoraCierre, self.empleado, motivos, comentarios)
+
+    def enLinea(self, estadoEnLinea):
+        self.estacion.enLinea(estadoEnLinea, self.fechaHoraCierre, self.empleado)
