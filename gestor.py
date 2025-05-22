@@ -1,4 +1,5 @@
 import sqlite3
+import sys
 from RUTAS.rutas import ARCHIVO_BD
 from datetime import datetime
 
@@ -160,4 +161,5 @@ class GestorOrdenDeCierre():
 
 
     def finCU(self):
-        del self
+        self.destroy()
+        sys.exit()
