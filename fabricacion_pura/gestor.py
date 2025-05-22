@@ -154,8 +154,14 @@ class GestorOrdenDeCierre():
 
     def enviarNotificacionMail(self):
         pass
+        
+        self.publicarMonitores()
+        
+    def publicarMonitores(self):
+        pass
 
-
+        
+        self.finCU()
 
 
 
