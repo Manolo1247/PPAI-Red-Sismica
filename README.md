@@ -1,26 +1,22 @@
 # Instrucciones para comenzar
 
 1. **Clona el repositorio:**
-
    ```bash
    git clone <URL_DEL_REPOSITORIO>
    cd PPAI-Red-Sismica
    ```
 
 2. **Instala [Pipenv](https://pipenv.pypa.io/):**
-
    ```bash
    pip install pipenv
    ```
 
-3. **Crea el entorno virtual e instala las dependencias:**
-
+3. **Crea el entorno virtual e instala las dependencias (solo la primera vez):**
    ```bash
    pipenv install
    ```
 
-4. **Activa el entorno virtual:**
-
+4. **Activa el entorno virtual (debes hacerlo cada vez que abras una nueva terminal):**
    ```bash
    pipenv shell
    ```
