@@ -1,4 +1,5 @@
 import sqlite3
+import sys
 from RUTAS.rutas import ARCHIVO_BD
 from datetime import datetime
 
@@ -153,17 +154,12 @@ class GestorOrdenDeCierre():
         self.enviarNotificacionMail()
 
     def enviarNotificacionMail(self):
-        pass
-        
+        # Aquí iría la lógica de notificación por mail
         self.publicarMonitores()
-        
+
     def publicarMonitores(self):
-        pass
-
-        
+        # Aquí iría la lógica de publicación de monitores
         self.finCU()
-
-
 
     def finCU(self, force=False):
         del self

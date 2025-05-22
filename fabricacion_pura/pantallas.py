@@ -59,15 +59,12 @@ class PantallaInicio(ctk.CTkFrame):
             fg_color="#dc3545",  # Rojo Bootstrap
             hover_color="#c82333",  # Hover más oscuro
             corner_radius=8,
-            command=lambda: self.finCU()
+            command=sys.exit
         )
         closeButton.pack(pady=30)
 
         # Añadir bordes sutiles en el cuerpo y el encabezado, para un efecto de separación
         self.mainFrame.configure(border_color="#dcdcdc", border_width=1)  # Borde de separación
-    def finCU(self):
-        self.destroy()
-        sys.exit()
 
 class PantallaOrdenDeCierre(ctk.CTkFrame):
     def __init__(self, parent, controller, sesion):
