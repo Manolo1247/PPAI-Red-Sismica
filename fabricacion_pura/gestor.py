@@ -73,8 +73,8 @@ class GestorOrdenDeCierre():
         self.ordenarOI()
 
     def ordenarOI(self):
-        # Ordenar las ordenes de inspección por fecha de finalización
-        self.datosOrdenesDeInspeccion.sort(key=lambda x: x["fechaFinalizacion"], reverse=True)
+        # Ordenar las ordenes de inspección por fecha de finalización (de más vieja a más nueva)
+        self.datosOrdenesDeInspeccion.sort(key=lambda x: x["fechaFinalizacion"])
         self.pantalla.mostrarOI(self.datosOrdenesDeInspeccion)
 
     def tomarOrden(self, orden):
