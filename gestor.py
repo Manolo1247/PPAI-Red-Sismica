@@ -154,3 +154,10 @@ class GestorOrdenDeCierre():
 
     def enviarNotificacionMail(self):
         pass
+
+
+
+
+
+    def finCU(self):
+        del self
