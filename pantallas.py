@@ -37,7 +37,7 @@ class PantallaInicio(ctk.CTkFrame):
             fg_color="#0d6efd",  # Azul Bootstrap
             hover_color="#0b5ed7",  # Hover más oscuro
             corner_radius=8,
-            #command=lambda: print("Diagramación")
+            #command=lambda: controller.showFrame(PantallaRegistrarInspeccion)
         )
         registrarBtn.pack(pady=20)
 
@@ -71,17 +71,19 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
     def __init__(self, parent, controller, sesion):
         super().__init__(parent)
         self.controller = controller
-
+        
         self.sesion = sesion
+        self.motivosGrilla = []
         self.motivosGrilla = []
 
     def habilitarVentana(self):
         self.gestor = GestorOrdenDeCierre(self.sesion, self)
-    
+
     def mostrarOI(self, ordenes):
-        # Limpiar la pantalla antes de cargar nuevos widgets para el correcto funcionamiento del botón volver
+        # Limpia la pantalla
         for widget in self.winfo_children():
             widget.destroy()
+
         # Encabezado estilo Bootstrap
         headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
         headerFrame.pack(fill="x", padx=10)
@@ -93,9 +95,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         )
         headerLabel.pack(pady=20)
 
-        # Cuerpo de la tabla
+        # Cuerpo de la tabla (más abajo con pady extra)
         tableFrame = ctk.CTkFrame(self)
-        tableFrame.pack(fill="both", expand=True)
+        tableFrame.pack(fill="both", expand=True, pady=(20, 0))  # <-- agrega espacio arriba
 
         # Crear encabezados de tabla
         columnas = ["Número de Orden", "Fecha de Finalizacion", "Nombre Estación", "Identificador Sismografo"]
@@ -117,20 +119,18 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             )
             selectButton.grid(row=i+1, column=4, padx=10, pady=5)
 
-            volver_btn = ctk.CTkButton(
+        # Botón para cancelar CU
+        cancelar_btn = ctk.CTkButton(
             self,
-            text="Volver",
+            text="Cancelar",
             fg_color="#dc3545",  # Rojo Bootstrap
             hover_color="#c82333",  # Hover más oscuro
-            command=self.volverInicio,
+            command=self.cancelar,
             width=200,
             height=55,
             font=("Arial", 18, "bold")
         )
-        volver_btn.pack(pady=10)
-
-    def volverInicio(self):
-        self.controller.showFrame(PantallaInicio)
+        cancelar_btn.pack(pady=10)
 
     def seleccionarOI(self, orden):
         self.gestor.tomarOrden(orden)
@@ -166,31 +166,31 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             self.tomarObservacion(observacion)
             # Puedes mostrar un mensaje de éxito o volver a otra pantalla
 
+        # Frame para los botones en línea
+        botones_frame = ctk.CTkFrame(self, fg_color="transparent")
+        botones_frame.pack(pady=20)
+
         guardar_btn = ctk.CTkButton(
-            self,
+            botones_frame,
             text="Guardar",
             command=guardar_observacion,
             width=200,  
             height=55,  
             font=("Arial", 18, "bold")  
         )
-        guardar_btn.pack(pady=20)
+        guardar_btn.pack(side="left", padx=10)
 
-        volver_btn = ctk.CTkButton(
-            self,
-            text="Volver",
-            fg_color="#dc3545",  # Rojo Bootstrap
-            hover_color="#c82333",  # Hover más oscuro
-            command=self.volver,
+        cancelar_btn = ctk.CTkButton(
+            botones_frame,
+            text="Cancelar",
+            fg_color="#dc3545",
+            hover_color="#c82333",
+            command=self.cancelar,
             width=200,
             height=55,
             font=("Arial", 18, "bold")
         )
-        volver_btn.pack(pady=10)
-
-    def volver(self):
-        self.controller.showFrame(PantallaOrdenDeCierre)
-
+        cancelar_btn.pack(side="left", padx=10)
 
     def tomarObservacion(self, observacion):
         self.gestor.tomarObservacion(observacion)
@@ -212,9 +212,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         )
         headerLabel.pack(pady=20)
 
-        # Cuerpo de la tabla
+        # Cuerpo de la tabla (más abajo con pady extra)
         tableFrame = ctk.CTkFrame(self)
-        tableFrame.pack(fill="both", expand=True)
+        tableFrame.pack(fill="both", expand=True, pady=(20, 0))  # <-- agrega espacio arriba
 
         # Crear encabezados de tabla
         columnas = ["Descripción", "Seleccionar"]
@@ -231,6 +231,19 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
                 command=lambda m=motivo: self.tomarMFS(m)
             )
             selectButton.grid(row=i+1, column=1, padx=10, pady=5)
+
+        # Botón para cancelar CU
+        cancelar_btn = ctk.CTkButton(
+            self,
+            text="Cancelar",
+            fg_color="#dc3545",  # Rojo Bootstrap
+            hover_color="#c82333",  # Hover más oscuro
+            command=self.cancelar,
+            width=200,
+            height=55,
+            font=("Arial", 18, "bold")
+        )
+        cancelar_btn.pack(pady=10)
 
     def tomarMFS(self, motivo):
         # Limpia la pantalla y muestra campo para comentario del motivo seleccionado
@@ -261,15 +274,32 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             self.motivosGrilla.remove(motivo)
             self.tomarComentario(motivo, comentario)
 
+        # Frame para los botones en línea
+        botones_frame = ctk.CTkFrame(self, fg_color="transparent")
+        botones_frame.pack(pady=20)
+        
         guardar_btn = ctk.CTkButton(
-            self,
+            botones_frame,
             text="Guardar Comentario",
             command=guardarComentario,
             width=200,  
             height=55,  
             font=("Arial", 18, "bold")  
         )
-        guardar_btn.pack(pady=20)
+        guardar_btn.pack(side="left", padx=10)
+
+        # Botón para cancelar CU
+        cancelar_btn = ctk.CTkButton(
+            botones_frame,
+            text="Cancelar",
+            fg_color="#dc3545",  # Rojo Bootstrap
+            hover_color="#c82333",  # Hover más oscuro
+            command=self.cancelar,
+            width=200,
+            height=55,
+            font=("Arial", 18, "bold")
+        )
+        cancelar_btn.pack(side="left", padx=10)
 
     def tomarComentario(self, motivo, comentario):
         self.gestor.tomarMotivoYComentario(motivo, comentario)
@@ -290,9 +320,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         )
         headerLabel.pack(pady=20)
 
-        # Cuerpo de la tabla
+        # Cuerpo de la tabla (más abajo con pady extra)
         tableFrame = ctk.CTkFrame(self)
-        tableFrame.pack(fill="both", expand=True)
+        tableFrame.pack(fill="both", expand=True, pady=(20, 0))  # <-- agrega espacio arriba
 
         # Crear encabezados de tabla
         columnas = ["Descripción", "Seleccionar"]
@@ -310,7 +340,6 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             )
             selectButton.grid(row=i+1, column=1, padx=10, pady=5)
 
-        # Botón de confirmación
         def confirmar_y_mostrar_espera():
             # Limpiar widgets
             for widget in self.winfo_children():
@@ -333,17 +362,37 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             # Llamar a la lógica real después de actualizar la UI
             self.after(100, self.gestor.confirmar)
 
+        # Frame para los botones en línea
+        botones_frame = ctk.CTkFrame(self, fg_color="transparent")
+        botones_frame.pack(pady=20)
+
+        # Botón de confirmación
         confirmar_btn = ctk.CTkButton(
-                self,
-                text="Confirmar",
-                font=("Arial", 18, "bold"),
-                fg_color="#198754",  # Verde Bootstrap
-                hover_color="#157347",  # Verde más oscuro al pasar el mouse
-                width=200,
-                height=50,
-                command=confirmar_y_mostrar_espera
-            )
-        confirmar_btn.pack(pady=30)
+            botones_frame,
+            text="Confirmar",
+            font=("Arial", 18, "bold"),
+            fg_color="#198754",
+            hover_color="#157347",
+            width=200,
+            height=50,
+            command=confirmar_y_mostrar_espera
+        )
+        confirmar_btn.pack(side="left", padx=10)
 
+        # Botón para cancelar CU
+        cancelar_btn = ctk.CTkButton(
+            botones_frame,
+            text="Cancelar",
+            fg_color="#dc3545",
+            hover_color="#c82333",
+            command=self.cancelar,
+            width=200,
+            height=55,
+            font=("Arial", 18, "bold")
+        )
+        cancelar_btn.pack(side="left", padx=10)
 
+    def cancelar(self):
+        self.gestor.finCU()
+        self.controller.showFrame(PantallaInicio)
 
