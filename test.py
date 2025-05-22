@@ -1,4 +1,4 @@
-from gestor import GestorOrdenDeCierre
+from fabricacion_pura.gestor import GestorOrdenDeCierre
 from entidades.sesion import Sesion
 from entidades.usuario import Usuario
 from entidades.empleado import Empleado

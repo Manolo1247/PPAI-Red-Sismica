@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import sys
-from gestor import GestorOrdenDeCierre
+from fabricacion_pura.gestor import GestorOrdenDeCierre
 
 class PantallaInicio(ctk.CTkFrame):
     def __init__(self, parent, controller, sesion):
@@ -395,4 +395,6 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
     def cancelar(self):
         self.gestor.finCU(force=True)
         self.controller.showFrame(PantallaInicio)
+
+
 

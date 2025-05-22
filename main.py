@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from pantallas import PantallaInicio, PantallaOrdenDeCierre
+from fabricacion_pura.pantallas import PantallaInicio, PantallaOrdenDeCierre
 
 from entidades.sesion import Sesion
 from entidades.usuario import Usuario
