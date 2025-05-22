@@ -177,7 +177,8 @@ class GestorOrdenDeCierre():
         self.publicarMonitores()
 
     def publicarMonitores(self):
-        # Aquí iría la lógica de publicación de monitores
+        PantallaCCRS.publicar()
+
         self.finCU()
 
     def finCU(self, cancelar=False):

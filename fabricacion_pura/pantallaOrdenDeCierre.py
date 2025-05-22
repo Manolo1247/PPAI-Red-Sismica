@@ -9,7 +9,6 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         
         self.sesion = sesion
         self.motivosGrilla = []
-        self.motivosGrilla = []
 
     def habilitarVentana(self):
         self.gestor = GestorOrdenDeCierre(self.sesion, self)
