@@ -16,29 +16,28 @@ class Pantalla(ctk.CTk):
         self.geometry("800x600")
 
         # Contenedor principal con fondo blanco
-        container = ctk.CTkFrame(self, fg_color="white")
-        container.pack(side=ctk.TOP, fill=ctk.BOTH, expand=True)
-        container.grid_columnconfigure(0, weight=1)
-        container.grid_rowconfigure(0, weight=1)
+        self.container = ctk.CTkFrame(self, fg_color="white")
+        self.container.pack(side=ctk.TOP, fill=ctk.BOTH, expand=True)
+        self.container.grid_columnconfigure(0, weight=1)
+        self.container.grid_rowconfigure(0, weight=1)
 
-        # Diccionario de todos los frames
-        self.frames = {}
-
-        # Crear e inicializar cada frame
-        for F in (PantallaInicio, PantallaOrdenDeCierre):
-            frame = F(container, self, sesion)
-            self.frames[F] = frame
-            frame.grid(row=0, column=0, sticky=ctk.NSEW)
+        self.current_frame = None
+        self.sesion = sesion
 
         # Mostrar la pantalla principal inicialmente
         self.showFrame(PantallaInicio)
 
-    def showFrame(self, container):
-        frame = self.frames[container]
+    def showFrame(self, frame_class):
+        # Destruir el frame actual si existe
+        if self.current_frame is not None:
+            self.current_frame.destroy()
+        # Crear una nueva instancia del frame
+        frame = frame_class(self.container, self, self.sesion)
+        frame.grid(row=0, column=0, sticky=ctk.NSEW)
+        self.current_frame = frame
         if hasattr(frame, 'habilitarVentana'):
             frame.habilitarVentana()
         frame.tkraise()
-
 
 if __name__ == "__main__":
     sesion = Sesion(
