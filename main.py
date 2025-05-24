@@ -38,7 +38,7 @@ class Pantalla(ctk.CTk):
         self.current_frame = frame
         if hasattr(frame, 'habilitarVentana'):
             frame.habilitarVentana()
-        frame.tkraise()
+        # frame.tkraise()
 
 if __name__ == "__main__":
     sesion = Sesion(

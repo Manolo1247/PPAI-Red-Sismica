@@ -11,6 +11,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.motivosGrilla = []
 
     def habilitarVentana(self):
+        self.tkraise()
         self.gestor = GestorOrdenDeCierre(self.sesion, self)
 
     def mostrarOI(self, ordenes):

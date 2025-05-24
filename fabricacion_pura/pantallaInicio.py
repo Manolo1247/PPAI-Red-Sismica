@@ -65,3 +65,6 @@ class PantallaInicio(ctk.CTkFrame):
 
         # Añadir bordes sutiles en el cuerpo y el encabezado, para un efecto de separación
         self.mainFrame.configure(border_color="#dcdcdc", border_width=1)  # Borde de separación
+
+    def habilitarVentana(self):
+        self.tkraise()
