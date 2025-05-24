@@ -142,7 +142,7 @@ class GestorOrdenDeCierre():
         self.ordenSeleccionada.cerrar(self.fechaHoraActual, self.estadoCerrada, self.observacion)
         
         if EnLinea:
-            self.ordenSeleccionada.enLinea(self.estadoEnLinea)
+            self.ordenSeleccionada.habilitarSismografo(self.estadoEnLinea)
             self.finCU()
         else:
             self.ordenSeleccionada.fueraDeServicio(self.estadoFueraDeServicio, self.motivosSeleccionados, self.comentarios)

@@ -44,7 +44,7 @@ class Sismografo:
         # Guardar 
         cambioEstado.guardar(self.identificador)
 
-    def enLinea(self, estadoEnLinea, fechaHoraFin, empleado):
+    def habilitar(self, estadoEnLinea, fechaHoraFin, empleado):
         for CE in self.cambiosEstado:
             if CE.esActual():
                 CE.setFechaHoraFin(fechaHoraFin, self.identificador)    # Actual:CambioEstado

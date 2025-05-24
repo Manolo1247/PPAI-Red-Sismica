@@ -83,7 +83,7 @@ class EstacionSismologica:
 
         sismografo.fueraDeServicio(estadoFueraServicio, fechaHoraFin, empleado, motivosSeleccionados, comentarios)
 
-    def enLinea(self, estadoEnLinea, fechaHoraFin, empleado):
+    def habilitarSismografo(self, estadoEnLinea, fechaHoraFin, empleado):
         with sqlite3.connect(ARCHIVO_BD) as con:
             cursor = con.cursor()
             sql = (
@@ -128,4 +128,4 @@ class EstacionSismologica:
         
         sismografo = Sismografo(rowSismografo[0], rowSismografo[1], rowSismografo[2], estadoSismografo, self, cambiosEstado)
 
-        sismografo.enLinea(estadoEnLinea, fechaHoraFin, empleado)
+        sismografo.habilitar(estadoEnLinea, fechaHoraFin, empleado)
