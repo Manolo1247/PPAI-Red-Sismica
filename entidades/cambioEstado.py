@@ -7,7 +7,7 @@ from .motivoTipo import MotivoTipo
 from .empleado import Empleado
 
 class CambioEstado:
-    def __init__(self, fechaHoraInicio, fechaHoraFin, empleado, estado, motivoFueraServicio, motivos=[], comentarios=[], idSismografo=None):
+    def __init__(self, fechaHoraInicio, fechaHoraFin, empleado, estado, motivoFueraServicio, motivos=[], comentarios=[]):
         self.fechaHoraInicio = fechaHoraInicio
         self.fechaHoraFin = fechaHoraFin
         self.empleado = empleado
@@ -15,7 +15,7 @@ class CambioEstado:
         self.motivosFueraServicio = motivoFueraServicio
 
         if self.estado.esFueraDeServicio() and len(self.motivosFueraServicio) == 0:
-            self.crearMotivos(motivos, comentarios, idSismografo)
+            self.crearMotivos(motivos, comentarios)
 
     def esActual(self):
         return self.fechaHoraFin is None
@@ -33,7 +33,7 @@ class CambioEstado:
             cursor.execute(sql1, (self.fechaHoraFin, idSismografo, self.fechaHoraInicio, self.estado.ambito, self.estado.nombre))
             con.commit()
 
-    def crearMotivos(self, motivos, comentarios, idSismografo):              
+    def crearMotivos(self, motivos, comentarios):              
         n = len(motivos)
         for i in range(n):
             motivo = motivos[i]

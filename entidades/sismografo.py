@@ -38,7 +38,7 @@ class Sismografo:
         self.setEstadoActual(estadoFueraServicio)
         
         # Nuevo:CambioEstado
-        cambioEstado = CambioEstado(fechaHoraFin, None, empleado, estadoFueraServicio, [], motivos=motivos, comentarios=comentarios, idSismografo=self.identificador)
+        cambioEstado = CambioEstado(fechaHoraFin, None, empleado, estadoFueraServicio, [], motivos=motivos, comentarios=comentarios)
         self.cambiosEstado.append(cambioEstado)
 
         # Guardar 
