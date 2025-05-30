@@ -1,6 +1,6 @@
 from peewee import *
 from RUTAS.rutas import ARCHIVO_BD
-from empleadoModel import EmpleadoModel
+from persistencia.empleadoModel import EmpleadoModel
 
 # Conexión a la base de datos SQLite
 db = SqliteDatabase(ARCHIVO_BD)

@@ -1,10 +1,10 @@
 import sqlite3
 from RUTAS.rutas import ARCHIVO_BD
 
-from .estado import Estado
-from .motivoFueraServicio import MotivoFueraServicio
-from .motivoTipo import MotivoTipo
-from .empleado import Empleado
+from entidades.estado import Estado
+from entidades.motivoFueraServicio import MotivoFueraServicio
+from entidades.motivoTipo import MotivoTipo
+from entidades.empleado import Empleado
 
 class CambioEstado:
     def __init__(self, fechaHoraInicio, fechaHoraFin, empleado, estado, motivoFueraServicio, motivos=[], comentarios=[]):

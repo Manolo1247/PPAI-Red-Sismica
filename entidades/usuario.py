@@ -1,4 +1,4 @@
-from .empleado import Empleado
+from entidades.empleado import Empleado
 
 class Usuario():
     def __init__(self, nombre, contraseña, empleado: Empleado):

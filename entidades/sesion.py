@@ -1,5 +1,5 @@
 from datetime import datetime
-from .usuario import Usuario
+from entidades.usuario import Usuario
 
 class Sesion():
     def __init__(self, usuario: Usuario, fecha_hora_inicio = datetime.now(), fecha_hora_fin = None):

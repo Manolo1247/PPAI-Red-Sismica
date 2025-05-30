@@ -1,7 +1,7 @@
 from peewee import *
 from RUTAS.rutas import ARCHIVO_BD
-from estacionSismologicaModel import EstacionSismologicaModel
-from estadoModel import EstadoModel
+from persistencia.estacionSismologicaModel import EstacionSismologicaModel
+from persistencia.estadoModel import EstadoModel
 
 # Conexión a la base de datos SQLite
 db = SqliteDatabase(ARCHIVO_BD)

@@ -1,6 +1,6 @@
 from peewee import *
 from RUTAS.rutas import ARCHIVO_BD
-from rolModel import RolModel
+from persistencia.rolModel import RolModel
 
 # Conexión a la base de datos SQLite
 db = SqliteDatabase(ARCHIVO_BD)

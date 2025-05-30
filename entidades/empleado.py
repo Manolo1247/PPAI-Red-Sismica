@@ -1,4 +1,4 @@
-from .rol import Rol
+from entidades.rol import Rol
 
 class Empleado():
     def __init__(self, nombre, apellido, mail, telefono, rol: Rol):

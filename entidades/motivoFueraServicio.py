@@ -1,4 +1,4 @@
-from .motivoTipo import MotivoTipo
+from entidades.motivoTipo import MotivoTipo
 
 class MotivoFueraServicio:
     def __init__(self, comentario, motivoTipo):

@@ -1,7 +1,7 @@
 from peewee import *
 from RUTAS.rutas import ARCHIVO_BD
-from cambioEstadoModel import CambioEstadoModel
-from motivoTipoModel import MotivoTipoModel
+from persistencia.cambioEstadoModel import CambioEstadoModel
+from persistencia.motivoTipoModel import MotivoTipoModel
 
 # Conexión a la base de datos SQLite
 db = SqliteDatabase(ARCHIVO_BD)

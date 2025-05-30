@@ -1,9 +1,9 @@
 import sqlite3
 from RUTAS.rutas import ARCHIVO_BD
 
-from .estado import Estado
+from entidades.estado import Estado
 # from .estacionSismologica import EstacionSismologica
-from .cambioEstado import CambioEstado
+from entidades.cambioEstado import CambioEstado
 
 class Sismografo:
     def __init__(self, identificador, numeroSerie, fechaAdquisicion, estadoActual, estacionSismologica, cambiosEstado):

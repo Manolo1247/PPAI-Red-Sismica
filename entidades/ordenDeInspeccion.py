@@ -1,9 +1,9 @@
 import sqlite3
 from RUTAS.rutas import ARCHIVO_BD
 
-from .estado import Estado
-from .empleado import Empleado
-from .estacionSismologica import EstacionSismologica
+from entidades.estado import Estado
+from entidades.empleado import Empleado
+from entidades.estacionSismologica import EstacionSismologica
 
 class OrdenDeInspeccion:
     def __init__(self, numero, fechaHoraInicio, fechaHoraFinalizacion, fechaHoraCierre, observacion_cierre, estacion: EstacionSismologica, empleado: Empleado, estado: Estado):
