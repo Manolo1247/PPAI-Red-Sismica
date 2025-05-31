@@ -106,7 +106,7 @@ class GestorOrdenDeCierre():
             elif estado.esAmbitoOI() and estado.esCerrada():
                 self.estadoCerrada = estado
 
-        self.pantalla.actualizarSituacionSismografo(self.estadoEnLinea.nombre, self.estadoFueraDeServicio.nombre)
+        self.pantalla.pedirSituacionSismografo(self.estadoEnLinea.nombre, self.estadoFueraDeServicio.nombre)
 
     def seleccionarEnLinea(self):
         self.getFechaHoraActual()

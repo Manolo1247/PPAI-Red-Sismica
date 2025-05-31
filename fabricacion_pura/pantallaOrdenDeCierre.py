@@ -139,7 +139,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
     def tomarObservacion(self, observacion):
         self.gestor.tomarObservacion(observacion)
 
-    def actualizarSituacionSismografo(self, estadoEnLinea, estadoFueraDeServicio):
+    def pedirSituacionSismografo(self, estadoEnLinea, estadoFueraDeServicio):
         # Limpia la pantalla
         for widget in self.winfo_children():
             widget.destroy()

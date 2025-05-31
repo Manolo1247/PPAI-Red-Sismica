@@ -2,7 +2,7 @@ import sqlite3
 from RUTAS.rutas import ARCHIVO_BD
 
 from entidades.estado import Estado
-# from .estacionSismologica import EstacionSismologica
+# from entidades.estacionSismologica import EstacionSismologica
 from entidades.cambioEstado import CambioEstado
 
 class Sismografo:
