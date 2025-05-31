@@ -6,7 +6,6 @@ from persistencia.motivoTipoModel import MotivoTipoModel
 # Conexión a la base de datos SQLite
 db = SqliteDatabase(ARCHIVO_BD)
 
-
 class MotivoFueraServicioModel(Model):
     fecha_hora_inicio = DateTimeField()
     ambito = CharField()
@@ -32,3 +31,24 @@ class MotivoFueraServicioModel(Model):
             & (CambioEstadoModel.nombre == self.nombre)
             & (CambioEstadoModel.identificador_sismografo == self.id_sismografo)
         )
+
+    @classmethod
+    def findByCambioEstado(cls, inicio, ambito, nombre):
+        from entidades.motivoFueraServicio import MotivoFueraServicio
+        from entidades.motivoTipo import MotivoTipo
+
+        rowMotivosFS = cls.select().where(
+            (cls.fecha_hora_inicio == inicio) & (cls.nombre == nombre) & (cls.ambito == ambito)
+        )
+
+        motivos = []
+        for rowMotivoFS in rowMotivosFS:
+            rowTipo = rowMotivoFS.motivo_tipo
+            motivos.append(
+                MotivoFueraServicio(
+                    rowMotivoFS.comentario,
+                    MotivoTipo(rowTipo.descripcion)
+                )
+            )
+
+        return motivos
