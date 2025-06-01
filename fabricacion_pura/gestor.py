@@ -3,7 +3,12 @@ import sys
 from RUTAS.rutas import ARCHIVO_BD
 from datetime import datetime
 
-from entidades.sesion import Sesion
+# Capa de persistencia
+from persistencia.ordenDeInspeccionModel import OrdenDeInspeccionModel
+from persistencia.sismografoModel import SismografoModel
+
+
+
 from entidades.rol import Rol
 from entidades.empleado import Empleado
 from entidades.ordenDeInspeccion import OrdenDeInspeccion
@@ -20,7 +25,8 @@ class GestorOrdenDeCierre():
         self.sesion = sesion
         self.pantalla = pantalla
         self.empleado = None
-        self.ordenesDeInspeccion = []
+        self.ordenesDeInspeccion = OrdenDeInspeccionModel.findAll()
+        self.sismografos = SismografoModel.findAll()
         self.datosOrdenesDeInspeccion = []
         self.ordenSeleccionada = None
         self.observacion = None
@@ -36,33 +42,11 @@ class GestorOrdenDeCierre():
         self.buscarEmpleadoRI()
 
     def buscarEmpleadoRI(self):
-        self.empleado = self.sesion.getUsuario()
+        self.empleado = self.sesion.getEmpleado()
+        
         self.buscarOrdenDeInspeccion()
 
     def buscarOrdenDeInspeccion(self):
-        # Buscar las ordenes de inspección en la base de datos
-        with sqlite3.connect(ARCHIVO_BD) as con:
-            cursor = con.cursor()
-            sql = (
-                'SELECT O.numero, O.fecha_hora_inicio, O.fecha_hora_finalizacion, O.fecha_hora_cierre, O.observacion_cierre, O.ambito, O.nombre, '
-                'E.nombre, E.apellido, E.mail, E.telefono, R.nombre, R.descripcion, '
-                'ES.codigo_estacion, ES.nombre, ES.latitud, ES.longitud, ES.fecha_solicitud_certificacion, ES.documento_certificacion, ES.numero_certificacion '
-                'FROM OrdenDeInspeccion O '
-                'JOIN Empleado E ON O.nombre_empleado = E.nombre AND O.apellido_empleado = E.apellido AND O.mail_empleado = E.mail '
-                'JOIN Rol R ON E.rol = R.nombre '
-                'JOIN EstacionSismologica ES ON O.codigo_estacion = ES.codigo_estacion '
-            )
-            cursor.execute(sql)
-            filas = cursor.fetchall()
-
-        for fila in filas:
-            rol = Rol(fila[11], fila[12])
-            empleado = Empleado(fila[7], fila[8], fila[9], fila[10], rol)
-            estacion = EstacionSismologica(fila[13], fila[14], fila[15], fila[16], fila[17], fila[18], fila[19])
-            estado = Estado(fila[5], fila[6])
-            orden = OrdenDeInspeccion(fila[0], fila[1], fila[2], fila[3], fila[4], estacion, empleado, estado)
-            self.ordenesDeInspeccion.append(orden)
-        
         for orden in self.ordenesDeInspeccion:
             # Filtrar las ordenes de inspección que son del empleado y están realizadas
             if orden.esDeEmpleado(self.empleado) and orden.estaRealizada():
@@ -70,8 +54,8 @@ class GestorOrdenDeCierre():
                     "numero": orden.getNroOrden(),
                     "fechaFinalizacion": orden.getFechaFinalizacion(),
                     "nombreEstacion": orden.getNombreEstacion(),
-                    "sismografo": orden.getSismografo(),  # solo el id
-                    "orden": orden  # objeto completo
+                    "sismografo": orden.getIdSismografo(self.sismografos),
+                    "orden": orden
                 }
                 self.datosOrdenesDeInspeccion.append(datos)
 
@@ -80,6 +64,7 @@ class GestorOrdenDeCierre():
     def ordenarOI(self):
         # Ordenar las ordenes de inspección por fecha de finalización (de más vieja a más nueva)
         self.datosOrdenesDeInspeccion.sort(key=lambda x: x["fechaFinalizacion"])
+        
         self.pantalla.mostrarOI(self.datosOrdenesDeInspeccion)
 
     def tomarOrden(self, orden):
