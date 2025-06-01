@@ -8,54 +8,51 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.controller = controller
         
         self.sesion = sesion
-        self.motivosGrilla = []
+        
+        self.headerText = ""
+        self.datosOrdenes = []
+        
+        self.motivosGrillaX = []
 
-    def habilitarVentana(self):
-        self.tkraise()
-        self.gestor = GestorOrdenDeCierre(self.sesion, self)
-
-    def mostrarOI(self, ordenes):
-        # Limpia la pantalla
-        for widget in self.winfo_children():
-            widget.destroy()
-
+    @property
+    def header(self):
         # Encabezado estilo Bootstrap
-        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
-        headerFrame.pack(fill="x", padx=10)
-        headerLabel = ctk.CTkLabel(
-            headerFrame,
-            text="Órdenes de Inspección",
+        frame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
+        frame.pack(fill="x", padx=10)
+
+        label = ctk.CTkLabel(
+            frame,
+            text=self.headerText,
             font=("Arial", 24, "bold"),
             text_color="white"
         )
-        headerLabel.pack(pady=20)
+        label.pack(pady=20)
 
-        # Cuerpo de la tabla (más abajo con pady extra)
+    @property
+    def ordenesGrilla(self):
         tableFrame = ctk.CTkFrame(self)
-        tableFrame.pack(fill="both", expand=True, pady=(20, 0))  # <-- agrega espacio arriba
+        tableFrame.pack(fill="both", expand=True, pady=(20, 0))
 
-        # Crear encabezados de tabla
-        columnas = ["Número de Orden", "Fecha de Finalizacion", "Nombre Estación", "Identificador Sismografo"]
-        for col_idx, col in enumerate(columnas):
-            label = ctk.CTkLabel(tableFrame, text=col, font=("Arial", 14, "bold"))
-            label.grid(row=0, column=col_idx, padx=10, pady=10)
-
-        if not ordenes:
+        if not self.datosOrdenes:
             sin_ordenes_label = ctk.CTkLabel(
                 tableFrame,
-                text="No se encontraron órdenes realizadas.",
-                font=("Arial", 16, "bold"),
+                text="No se encontraron órdenes \ncompletamente realizadas",
+                font=("Arial", 36, "bold"),
                 text_color="red"
             )
-            sin_ordenes_label.grid(row=1, column=0, columnspan=5, pady=30)
+            sin_ordenes_label.pack(expand=True, pady=60)
         else:
-            # Llenar la tabla con datos
-            for i, orden in enumerate(ordenes):
+            # Encabezados
+            columnas = ["Número de Orden", "Fecha de Finalizacion", "Nombre Estación", "Identificador Sismografo"]
+            for col_idx, col in enumerate(columnas):
+                label = ctk.CTkLabel(tableFrame, text=col, font=("Arial", 14, "bold"))
+                label.grid(row=0, column=col_idx, padx=10, pady=10)
+
+            for i, orden in enumerate(self.datosOrdenes):
                 ctk.CTkLabel(tableFrame, text=orden.get("numero", "")).grid(row=i+1, column=0, padx=10, pady=5)
                 ctk.CTkLabel(tableFrame, text=orden.get("fechaFinalizacion", "")).grid(row=i+1, column=1, padx=10, pady=5)
                 ctk.CTkLabel(tableFrame, text=orden.get("nombreEstacion", "")).grid(row=i+1, column=2, padx=10, pady=5)
                 ctk.CTkLabel(tableFrame, text=orden.get("sismografo", "")).grid(row=i+1, column=3, padx=10, pady=5)
-                # Botón para seleccionar esta orden
                 selectButton = ctk.CTkButton(
                     tableFrame,
                     text="Seleccionar",
@@ -63,6 +60,8 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
                 )
                 selectButton.grid(row=i+1, column=4, padx=10, pady=5)
 
+    @property
+    def botonCancelar(self):
         # Botón para cancelar CU
         cancelar_btn = ctk.CTkButton(
             self,
@@ -76,6 +75,27 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         )
         cancelar_btn.pack(pady=10)
 
+
+    def habilitarVentana(self):
+        self.tkraise()
+        self.gestor = GestorOrdenDeCierre(self.sesion, self)
+
+    def mostrarOI(self, ordenes):
+        # Limpia la pantalla
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        # Encabezado
+        self.headerText = "Órdenes de Inspección"
+        self.header
+
+        # tabla 
+        self.datosOrdenes = ordenes
+        self.ordenesGrilla
+
+        # Botón para cancelar CU
+        self.botonCancelar
+
     def seleccionarOI(self, orden):
         self.gestor.tomarOrden(orden)
 
@@ -84,16 +104,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         for widget in self.winfo_children():
             widget.destroy()
 
-        # Encabezado estilo Bootstrap
-        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
-        headerFrame.pack(fill="x", padx=10)
-        headerLabel = ctk.CTkLabel(
-            headerFrame,
-            text="Ingrese la observación de cierre:",
-            font=("Arial", 24, "bold"),
-            text_color="white"
-        )
-        headerLabel.pack(pady=20)
+        # Encabezado
+        self.headerText = "Ingrese la observación de cierre"
+        self.header
 
         observacion_entry = ctk.CTkTextbox(self, width=400, height=100)
         observacion_entry.pack(pady=10)
@@ -124,17 +137,8 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         )
         guardar_btn.pack(side="left", padx=10)
 
-        cancelar_btn = ctk.CTkButton(
-            botones_frame,
-            text="Cancelar",
-            fg_color="#dc3545",
-            hover_color="#c82333",
-            command=self.cerrar,
-            width=200,
-            height=55,
-            font=("Arial", 18, "bold")
-        )
-        cancelar_btn.pack(side="left", padx=10)
+        # Botón para cancelar CU
+        self.botonCancelar
 
     def tomarObservacion(self, observacion):
         self.gestor.tomarObservacion(observacion)
@@ -144,16 +148,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         for widget in self.winfo_children():
             widget.destroy()
 
-        # Encabezado estilo Bootstrap
-        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
-        headerFrame.pack(fill="x", padx=10)
-        headerLabel = ctk.CTkLabel(
-            headerFrame,
-            text="Situación del Sismógrafo",
-            font=("Arial", 24, "bold"),
-            text_color="white"
-        )
-        headerLabel.pack(pady=20)
+        # Encabezado
+        self.headerText = "Situación del Sismógrafo"
+        self.header
 
         # Frame para los estados y botones
         estados_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -196,34 +193,17 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         fs_btn.grid(row=1, column=1, padx=40, pady=10)
 
         # Botón para cancelar CU
-        cancelar_btn = ctk.CTkButton(
-            self,
-            text="Cancelar",
-            fg_color="#dc3545",  # Rojo Bootstrap
-            hover_color="#c82333",  # Hover más oscuro
-            command=self.cerrar,
-            width=200,
-            height=55,
-            font=("Arial", 18, "bold")
-        )
-        cancelar_btn.pack(pady=10)
+        self.botonCancelar
 
     def mostrarMFS(self, motivos):
-        self.motivosGrilla = motivos
+        self.motivosGrillaX = motivos
         # Limpia la pantalla
         for widget in self.winfo_children():
             widget.destroy()
 
-        # Encabezado estilo Bootstrap
-        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
-        headerFrame.pack(fill="x", padx=10)
-        headerLabel = ctk.CTkLabel(
-            headerFrame,
-            text="Motivos de Cierre",
-            font=("Arial", 24, "bold"),
-            text_color="white"
-        )
-        headerLabel.pack(pady=20)
+        # Encabezado
+        self.headerText = "Motivos de Cierre"
+        self.header
 
         # Cuerpo de la tabla (más abajo con pady extra)
         tableFrame = ctk.CTkFrame(self)
@@ -246,17 +226,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             selectButton.grid(row=i+1, column=1, padx=10, pady=5)
 
         # Botón para cancelar CU
-        cancelar_btn = ctk.CTkButton(
-            self,
-            text="Cancelar",
-            fg_color="#dc3545",  # Rojo Bootstrap
-            hover_color="#c82333",  # Hover más oscuro
-            command=self.cerrar,
-            width=200,
-            height=55,
-            font=("Arial", 18, "bold")
-        )
-        cancelar_btn.pack(pady=10)
+        self.botonCancelar
 
     def tomarMFS(self, motivo):
         # Limpia la pantalla y muestra campo para comentario del motivo seleccionado
@@ -284,7 +254,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
                 return
             mensaje_error.configure(text="")
             # Elimina el motivo de la grilla antes de pasar al gestor
-            self.motivosGrilla.remove(motivo)
+            self.motivosGrillaX.remove(motivo)
             self.tomarComentario(motivo, comentario)
 
         # Frame para los botones en línea
@@ -302,17 +272,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         guardar_btn.pack(side="left", padx=10)
 
         # Botón para cancelar CU
-        cancelar_btn = ctk.CTkButton(
-            botones_frame,
-            text="Cancelar",
-            fg_color="#dc3545",  # Rojo Bootstrap
-            hover_color="#c82333",  # Hover más oscuro
-            command=self.cerrar,
-            width=200,
-            height=55,
-            font=("Arial", 18, "bold")
-        )
-        cancelar_btn.pack(side="left", padx=10)
+        self.botonCancelar
 
     def tomarComentario(self, motivo, comentario):
         self.gestor.tomarMotivoYComentario(motivo, comentario)
@@ -322,16 +282,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         for widget in self.winfo_children():
             widget.destroy()
 
-        # Encabezado estilo Bootstrap
-        headerFrame = ctk.CTkFrame(self, fg_color="#0d6efd", height=80)
-        headerFrame.pack(fill="x", padx=10)
-        headerLabel = ctk.CTkLabel(
-            headerFrame,
-            text="Motivos de Cierre",
-            font=("Arial", 24, "bold"),
-            text_color="white"
-        )
-        headerLabel.pack(pady=20)
+        # Encabezado
+        self.headerText = "Motivos de Cierre"
+        self.header
 
         # Cuerpo de la tabla (más abajo con pady extra)
         tableFrame = ctk.CTkFrame(self)
@@ -344,7 +297,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             label.grid(row=0, column=col_idx, padx=10, pady=10)
 
         # Llenar la tabla con datos, cada motivo tiene un botón "Seleccionar"
-        for i, motivo in enumerate(self.motivosGrilla):
+        for i, motivo in enumerate(self.motivosGrillaX):
             ctk.CTkLabel(tableFrame, text=getattr(motivo, "getDescripcion", lambda: str(motivo))()).grid(row=i+1, column=0, padx=10, pady=5)
             selectButton = ctk.CTkButton(
                 tableFrame,
@@ -393,17 +346,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         confirmar_btn.pack(side="left", padx=10)
 
         # Botón para cancelar CU
-        cancelar_btn = ctk.CTkButton(
-            botones_frame,
-            text="Cancelar",
-            fg_color="#dc3545",
-            hover_color="#c82333",
-            command=self.cerrar,
-            width=200,
-            height=55,
-            font=("Arial", 18, "bold")
-        )
-        cancelar_btn.pack(side="left", padx=10)
+        self.botonCancelar
 
     def cerrar(self):
         from fabricacion_pura.pantallaInicio import PantallaInicio
