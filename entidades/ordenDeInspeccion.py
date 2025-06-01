@@ -31,8 +31,8 @@ class OrdenDeInspeccion:
     def getNombreEstacion(self):
         return self.estacion.getNombre()
     
-    def getIdSismografo(self):
-        return self.estacion.getIdSismografo()
+    def getIdSismografo(self, sismografos):
+        return self.estacion.getIdSismografo(sismografos)
     
     def setEstado(self, estado):
         self.estado = estado

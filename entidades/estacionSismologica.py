@@ -1,7 +1,6 @@
 import sqlite3
 from RUTAS.rutas import ARCHIVO_BD
 
-from entidades.sismografo import Sismografo
 from entidades.estado import Estado
 from entidades.cambioEstado import CambioEstado
 from entidades.empleado import Empleado
@@ -19,24 +18,24 @@ class EstacionSismologica:
         self.documentoCertificacion = documentoCertificacion
         self.numeroCertificacion = numeroCertificacion
 
+    def __eq__(self, other):
+        if not isinstance(other, EstacionSismologica):
+            return False
+        return (
+            self.codigo == other.codigo
+        )
+
     def getNombre(self):
         return self.nombre
     
-    def getIdSismografo(self):
-        with sqlite3.connect(ARCHIVO_BD) as con:
-            cursor = con.cursor()
-            sql1 = (
-                'SELECT S.identificador, S.numero_serie, S.fecha_adquisicion '
-                'FROM Sismografo S '
-                'WHERE S.codigo_estacion = ?'
-            )
-            cursor.execute(sql1, (self.codigo,))
-            row = cursor.fetchone()
-
-        sismografo = Sismografo(row[0], row[1], row[2], None, None, None)
-        return sismografo.getId()
+    def getIdSismografo(self, sismografos):
+        for sismografo in sismografos:
+            if sismografo.esTuEstacion(self):
+                return sismografo.getId()
 
     def fueraDeServicio(self, estadoFueraServicio, fechaHoraFin, empleado, motivosSeleccionados, comentarios):
+        from entidades.sismografo import Sismografo
+
         with sqlite3.connect(ARCHIVO_BD) as con:
             cursor = con.cursor()
             sql = (
@@ -84,6 +83,8 @@ class EstacionSismologica:
         sismografo.fueraDeServicio(estadoFueraServicio, fechaHoraFin, empleado, motivosSeleccionados, comentarios)
 
     def habilitarSismografo(self, estadoEnLinea, fechaHoraFin, empleado):
+        from entidades.sismografo import Sismografo
+
         with sqlite3.connect(ARCHIVO_BD) as con:
             cursor = con.cursor()
             sql = (

@@ -2,11 +2,11 @@ import sqlite3
 from RUTAS.rutas import ARCHIVO_BD
 
 from entidades.estado import Estado
-# from entidades.estacionSismologica import EstacionSismologica
+from entidades.estacionSismologica import EstacionSismologica
 from entidades.cambioEstado import CambioEstado
 
 class Sismografo:
-    def __init__(self, identificador, numeroSerie, fechaAdquisicion, estadoActual, estacionSismologica, cambiosEstado):
+    def __init__(self, identificador, numeroSerie, fechaAdquisicion, estadoActual: Estado, estacionSismologica: EstacionSismologica, cambiosEstado: CambioEstado):
         self.identificador = identificador
         self.numeroSerie = numeroSerie
         self.fechaAdquisicion = fechaAdquisicion
@@ -14,6 +14,9 @@ class Sismografo:
         self.estacionSismologica = estacionSismologica
         self.cambiosEstado = cambiosEstado
 
+    def esTuEstacion(self, estacion):
+        return estacion == self.estacionSismologica
+    
     def getId(self):
         return self.identificador
 
