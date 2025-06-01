@@ -7,5 +7,5 @@ class Sesion():
         self.fecha_hora_inicio = fecha_hora_inicio
         self.fecha_hora_fin = fecha_hora_fin
 
-    def getUsuario(self):
+    def getEmpleado(self):
         return self.usuario.getEmpleado()
