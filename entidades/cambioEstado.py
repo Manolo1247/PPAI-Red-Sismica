@@ -2,9 +2,10 @@ from entidades.estado import Estado
 from entidades.motivoFueraServicio import MotivoFueraServicio
 from entidades.motivoTipo import MotivoTipo
 from entidades.empleado import Empleado
+from typing import List
 
 class CambioEstado:
-    def __init__(self, fechaHoraInicio, fechaHoraFin, empleado: Empleado, estado: Estado, motivoFueraServicio, motivos=[], comentarios=[]):
+    def __init__(self, fechaHoraInicio, fechaHoraFin, empleado: Empleado, estado: Estado, motivoFueraServicio: List[MotivoFueraServicio], motivos=[], comentarios=[]):
         self.fechaHoraInicio = fechaHoraInicio
         self.fechaHoraFin = fechaHoraFin
         self.empleado = empleado

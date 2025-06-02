@@ -1,9 +1,10 @@
 from entidades.estado import Estado
 from entidades.estacionSismologica import EstacionSismologica
 from entidades.cambioEstado import CambioEstado
+from typing import List
 
 class Sismografo:
-    def __init__(self, identificador, numeroSerie, fechaAdquisicion, estadoActual: Estado, estacionSismologica: EstacionSismologica, cambiosEstado: CambioEstado):
+    def __init__(self, identificador, numeroSerie, fechaAdquisicion, estadoActual: Estado, estacionSismologica: EstacionSismologica, cambiosEstado: List[CambioEstado]):
         self.identificador = identificador
         self.numeroSerie = numeroSerie
         self.fechaAdquisicion = fechaAdquisicion
