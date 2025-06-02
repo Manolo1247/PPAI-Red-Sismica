@@ -8,11 +8,6 @@ from persistencia.motivoTipoModel import MotivoTipoModel
 from persistencia.empleadoModel import EmpleadoModel
 
 
-
-from entidades.rol import Rol
-from entidades.empleado import Empleado
-from entidades.motivoTipo import MotivoTipo
-
 from fabricacion_pura.interfazMail import InterfazMail
 from fabricacion_pura.pantallaCCRS import PantallaCCRS
 
@@ -183,5 +178,7 @@ class GestorOrdenDeCierre():
 
     def finCU(self):
         # lógica para persistir los cambios
+        OrdenDeInspeccionModel.updateFromEntity(self.ordenSeleccionada)
+        SismografoModel.updateFromEntity(self.sismografoSeleccionado)
 
         self.pantalla.cerrar()

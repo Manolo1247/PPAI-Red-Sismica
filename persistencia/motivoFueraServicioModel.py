@@ -52,3 +52,24 @@ class MotivoFueraServicioModel(Model):
             )
 
         return motivos
+    
+    @classmethod
+    def createFromEntity(cls, motivoFS, fecha_hora_inicio, ambito, nombre, id_sismografo):
+        from entidades.motivoFueraServicio import MotivoFueraServicio
+        if not isinstance(motivoFS, MotivoFueraServicio):
+            raise TypeError("El parámetro debe ser una instancia de MotivoFueraServicio")
+
+        # Buscar el MotivoTipoModel correspondiente
+        motivo_tipo_row = MotivoTipoModel.get_or_none(MotivoTipoModel.descripcion == motivoFS.motivoTipo.descripcion)
+        if not motivo_tipo_row:
+            raise ValueError(f"No existe un MotivoTipo con descripción '{motivoFS.motivoTipo.descripcion}'")
+
+        # Crear el registro usando la instancia de MotivoTipoModel
+        cls.create(
+            fecha_hora_inicio=fecha_hora_inicio,
+            ambito=ambito,
+            nombre=nombre,
+            id_sismografo=id_sismografo,
+            motivo_tipo=motivo_tipo_row,
+            comentario=motivoFS.comentario
+        )

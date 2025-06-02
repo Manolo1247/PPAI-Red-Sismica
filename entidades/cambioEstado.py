@@ -26,6 +26,6 @@ class CambioEstado:
         for i in range(n):
             motivo = motivos[i]
             comentario = comentarios[i]
-            motivoFueraServicio = MotivoFueraServicio(comentario, MotivoTipo(motivo))
+            motivoFueraServicio = MotivoFueraServicio(comentario, motivo)
             
             self.motivosFueraServicio.append(motivoFueraServicio)

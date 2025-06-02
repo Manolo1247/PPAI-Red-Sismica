@@ -87,3 +87,61 @@ class CambioEstadoModel(Model):
             )
 
         return cambios
+    
+    @classmethod
+    def updateFromEntity(cls, cambioEstado, id_sismografo):
+        from entidades.cambioEstado import CambioEstado
+        if not isinstance(cambioEstado, CambioEstado):
+            raise TypeError("El parámetro debe ser una instancia de CambioEstado")
+        
+        # Buscar el registro por clave compuesta
+        row = cls.get_or_none(
+            (cls.fecha_hora_inicio == cambioEstado.fechaHoraInicio) &
+            (cls.ambito == cambioEstado.estado.ambito) &
+            (cls.nombre == cambioEstado.estado.nombre) &
+            (cls.sismografo == id_sismografo)
+        )
+        if not row:
+            raise ValueError("No existe un CambioEstado con los datos proporcionados")
+
+        # Actualizar los campos
+        row.fecha_hora_fin = cambioEstado.fechaHoraFin
+        if cambioEstado.empleado:
+            row.nombre_empleado = cambioEstado.empleado.nombre
+            row.apellido_empleado = cambioEstado.empleado.apellido
+            row.mail_empleado = cambioEstado.empleado.mail
+        if cambioEstado.estado:
+            row.ambito = cambioEstado.estado.ambito
+            row.nombre = cambioEstado.estado.nombre
+
+        row.save()
+
+    @classmethod
+    def createFromEntity(cls, cambioEstado, id_sismografo):
+        from entidades.cambioEstado import CambioEstado
+        if not isinstance(cambioEstado, CambioEstado):
+            raise TypeError("El parámetro debe ser una instancia de CambioEstado")
+        
+        # Crear el registro en la tabla CambioDeEstado
+        cls.create(
+            fecha_hora_inicio=cambioEstado.fechaHoraInicio,
+            fecha_hora_fin=cambioEstado.fechaHoraFin,
+            ambito=cambioEstado.estado.ambito,
+            nombre=cambioEstado.estado.nombre,
+            sismografo=id_sismografo,
+            nombre_empleado=cambioEstado.empleado.nombre,
+            apellido_empleado=cambioEstado.empleado.apellido,
+            mail_empleado=cambioEstado.empleado.mail,
+        )
+
+        # Si hay motivos fuera de servicio, crearlos en la tabla correspondiente
+        if hasattr(cambioEstado, "motivosFueraServicio") and cambioEstado.motivosFueraServicio:
+            from persistencia.motivoFueraServicioModel import MotivoFueraServicioModel
+            for motivo in cambioEstado.motivosFueraServicio:
+                MotivoFueraServicioModel.createFromEntity(
+                    motivo,
+                    cambioEstado.fechaHoraInicio,
+                    cambioEstado.estado.ambito,
+                    cambioEstado.estado.nombre,
+                    id_sismografo
+                )

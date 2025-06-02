@@ -50,7 +50,7 @@ class SismografoModel(Model):
                 Sismografo(
                     rowSismografo.identificador,
                     rowSismografo.numero_serie,
-                    rowSismografo.fecha_adquisicion,
+                    rowSismografo.fecha_adquisicion.date(),
                     Estado( rowEstado.ambito, rowEstado.nombre ),
                     EstacionSismologica(
                         rowEstacion.codigo_estacion,
@@ -66,3 +66,48 @@ class SismografoModel(Model):
             )
 
         return sismografos
+    
+    @classmethod
+    def updateFromEntity(cls, sismografo):
+        from entidades.sismografo import Sismografo
+        if not isinstance(sismografo, Sismografo):
+            raise TypeError("El parámetro debe ser una instancia de Sismografo")
+        
+        # Buscar el registro en la BD
+        row = cls.get_or_none(cls.identificador == sismografo.identificador)
+        if not row:
+            raise ValueError(f"No existe un Sismografo con identificador {sismografo.identificador}")
+
+        # Actualizar los campos principales
+        row.numero_serie = sismografo.numeroSerie
+        row.fecha_adquisicion = sismografo.fechaAdquisicion
+
+        # Actualizar estado actual
+        if sismografo.estadoActual:
+            row.ambito_estado_actual = sismografo.estadoActual.ambito
+            row.nombre_estado_actual = sismografo.estadoActual.nombre
+
+        # Actualizar estación asociada
+        if sismografo.estacionSismologica:
+            row.estacion = sismografo.estacionSismologica.codigo
+
+        row.save()
+
+        from persistencia.cambioEstadoModel import CambioEstadoModel
+
+        cambioEstadoActual = None
+        cambioEstadoAnterior = None
+
+        for cambioEstado in sismografo.cambiosEstado:
+            if cambioEstado.esActual():
+                cambioEstadoActual = cambioEstado
+                break
+        for cambioEstado in sismografo.cambiosEstado:
+            if cambioEstado.fechaHoraFin == cambioEstadoActual.fechaHoraInicio:
+                cambioEstadoAnterior = cambioEstado
+                break
+
+        CambioEstadoModel.updateFromEntity(cambioEstadoAnterior, sismografo.identificador)
+        CambioEstadoModel.createFromEntity(cambioEstadoActual, sismografo.identificador)
+
+        

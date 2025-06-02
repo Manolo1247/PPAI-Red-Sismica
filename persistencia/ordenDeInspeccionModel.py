@@ -93,3 +93,34 @@ class OrdenDeInspeccionModel(Model):
             )
 
         return ordenes
+
+    @classmethod
+    def updateFromEntity(cls, orden):
+        from entidades.ordenDeInspeccion import OrdenDeInspeccion
+        if not isinstance(orden, OrdenDeInspeccion):
+            raise TypeError("El parámetro debe ser una instancia de OrdenDeInspeccion")
+
+        
+        # Buscar la orden en la BD
+        row = cls.get_or_none(cls.numero == orden.numero)
+        if not row:
+            raise ValueError(f"No existe una orden con número {orden.numero}")
+
+        # Actualizar los campos
+        row.fecha_hora_inicio = orden.fechaHoraInicio
+        row.fecha_hora_finalizacion = orden.fechaHoraFinalizacion
+        row.fecha_hora_cierre = orden.fechaHoraCierre
+        row.observacion_cierre = orden.observacion_cierre
+
+        # Actualizar datos relacionados
+        if orden.empleado:
+            row.nombre_empleado = orden.empleado.nombre
+            row.apellido_empleado = orden.empleado.apellido
+            row.mail_empleado = orden.empleado.mail
+        if orden.estado:
+            row.ambito = orden.estado.ambito
+            row.nombre = orden.estado.nombre
+        if orden.estacion:
+            row.estacion = orden.estacion.codigo
+
+        row.save()

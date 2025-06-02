@@ -9,9 +9,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         
         self.sesion = sesion
         
-        self.headerText = ""
+        self.headerText = None
         self.datosOrdenes = []
-        self.observacion = ""
+        self.observacion = None
         
         self.motivosGrillaX = []
 
