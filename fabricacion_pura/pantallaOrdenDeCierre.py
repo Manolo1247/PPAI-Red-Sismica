@@ -185,7 +185,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         en_linea_btn = ctk.CTkButton(
             estados_frame,
             text="Seleccionar",
-            command=self.gestor.seleccionarEnLinea,
+            command=self.seleccionarEnLinea,
             width=180,
             height=45,
             font=("Arial", 16, "bold")
@@ -203,7 +203,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         fs_btn = ctk.CTkButton(
             estados_frame,
             text="Seleccionar",
-            command=self.gestor.seleccionarFS,
+            command=self.seleccionarFS,
             width=180,
             height=45,
             font=("Arial", 16, "bold")
@@ -212,6 +212,12 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
 
         # Botón para cancelar CU
         self.botonCancelar
+
+    def seleccionarFS(self):
+        self.gestor.seleccionarFS()
+
+    def seleccionarEnLinea(self):
+        self.gestor.seleccionarEnLinea()
 
     def mostrarMFS(self, motivos):
         self.motivosGrillaX = motivos
@@ -332,28 +338,6 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             )
             selectButton.grid(row=i+1, column=1, padx=10, pady=5)
 
-        def confirmar_y_mostrar_espera():
-            # Limpiar widgets
-            for widget in self.winfo_children():
-                widget.destroy()
-            # Mostrar mensaje de espera
-            espera_frame = ctk.CTkFrame(self)
-            espera_frame.pack(expand=True)
-            engranaje_label = ctk.CTkLabel(
-                espera_frame,
-                text="🔄",
-                font=("Arial", 48)
-            )
-            engranaje_label.pack(pady=10)
-            mensaje_label = ctk.CTkLabel(
-                espera_frame,
-                text="Por favor, espere...",
-                font=("Arial", 20, "bold")
-            )
-            mensaje_label.pack(pady=10)
-            # Llamar a la lógica real después de actualizar la UI
-            self.after(100, self.gestor.confirmar)
-
         # Frame para los botones en línea
         botones_frame = ctk.CTkFrame(self, fg_color="transparent")
         botones_frame.pack(pady=20)
@@ -367,12 +351,34 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             hover_color="#157347",
             width=200,
             height=50,
-            command=confirmar_y_mostrar_espera
+            command=self.confirmar
         )
         confirmar_btn.pack(side="left", padx=10)
 
         # Botón para cancelar CU
         self.botonCancelar
+
+    def confirmar(self):
+        # Limpiar widgets
+        for widget in self.winfo_children():
+            widget.destroy()
+        # Mostrar mensaje de espera
+        espera_frame = ctk.CTkFrame(self)
+        espera_frame.pack(expand=True)
+        engranaje_label = ctk.CTkLabel(
+            espera_frame,
+            text="🔄",
+            font=("Arial", 48)
+        )
+        engranaje_label.pack(pady=10)
+        mensaje_label = ctk.CTkLabel(
+            espera_frame,
+            text="Por favor, espere...",
+            font=("Arial", 20, "bold")
+        )
+        mensaje_label.pack(pady=10)
+        # Llamar a la lógica real después de actualizar la UI
+        self.after(100, self.gestor.confirmar)
 
     def cerrar(self):
         from fabricacion_pura.pantallaInicio import PantallaInicio
