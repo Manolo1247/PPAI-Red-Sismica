@@ -1,19 +1,16 @@
-import sqlite3
-import sys
-from RUTAS.rutas import ARCHIVO_BD
 from datetime import datetime
 
 # Capa de persistencia
 from persistencia.ordenDeInspeccionModel import OrdenDeInspeccionModel
 from persistencia.sismografoModel import SismografoModel
+from persistencia.estadoModel import EstadoModel
+from persistencia.motivoTipoModel import MotivoTipoModel
+from persistencia.empleadoModel import EmpleadoModel
 
 
 
 from entidades.rol import Rol
 from entidades.empleado import Empleado
-from entidades.ordenDeInspeccion import OrdenDeInspeccion
-from entidades.estacionSismologica import EstacionSismologica
-from entidades.estado import Estado
 from entidades.motivoTipo import MotivoTipo
 
 from fabricacion_pura.interfazMail import InterfazMail
@@ -27,45 +24,52 @@ class GestorOrdenDeCierre():
         self.empleado = None
         self.ordenesDeInspeccion = OrdenDeInspeccionModel.findAll()
         self.sismografos = SismografoModel.findAll()
-        self.datosOrdenesDeInspeccion = []
         self.ordenSeleccionada = None
         self.observacion = None
-        self.motivos = []
+        self.estados = EstadoModel.findAll()
+        self.estadoFueraDeServicio = None
+        self.estadoEnLinea = None
+        self.motivosTipo = MotivoTipoModel.findAll()
         self.motivosSeleccionados = []
         self.comentarios = []
-        self.estadoEnLinea = None
-        self.estadoFueraDeServicio = None
         self.estadoCerrada = None
         self.fechaHoraActual = None
+        self.empleados = EmpleadoModel.findAll()
         self.mailsResponsableReparaciones = []
+        self.sismografoSeleccionado = None
 
         self.buscarEmpleadoRI()
 
     def buscarEmpleadoRI(self):
         self.empleado = self.sesion.getEmpleado()
-        
         self.buscarOrdenDeInspeccion()
 
     def buscarOrdenDeInspeccion(self):
+        datosOrdenesDeInspeccion = []
         for orden in self.ordenesDeInspeccion:
             # Filtrar las ordenes de inspección que son del empleado y están realizadas
             if orden.esDeEmpleado(self.empleado) and orden.estaRealizada():
+                for s in self.sismografos:
+                    estacion = orden.getEstacion()
+                    if s.esTuEstacion(estacion):
+                        sismografo = s
+                        break
+                
                 datos = {
                     "numero": orden.getNroOrden(),
                     "fechaFinalizacion": orden.getFechaFinalizacion(),
                     "nombreEstacion": orden.getNombreEstacion(),
-                    "sismografo": orden.getIdSismografo(self.sismografos),
+                    "sismografo": sismografo.getId(),
                     "orden": orden
                 }
-                self.datosOrdenesDeInspeccion.append(datos)
+                datosOrdenesDeInspeccion.append(datos)
 
-        self.ordenarOI()
+        self.ordenarOI(datosOrdenesDeInspeccion)
 
-    def ordenarOI(self):
+    def ordenarOI(self, ordenes):
         # Ordenar las ordenes de inspección por fecha de finalización (de más vieja a más nueva)
-        self.datosOrdenesDeInspeccion.sort(key=lambda x: x["fechaFinalizacion"])
-        
-        self.pantalla.mostrarOI(self.datosOrdenesDeInspeccion)
+        ordenes.sort(key=lambda x: x["fechaFinalizacion"])
+        self.pantalla.mostrarOI(ordenes)
 
     def tomarOrden(self, orden):
         self.ordenSeleccionada = orden
@@ -73,44 +77,48 @@ class GestorOrdenDeCierre():
 
     def tomarObservacion(self, observacion):
         self.observacion = observacion
-        self.buscarEstados()
+        self.buscarEstadoFS()
 
-    def buscarEstados(self):
-        with sqlite3.connect(ARCHIVO_BD) as con:
-            cursor = con.cursor()
-            sql = 'SELECT ambito, nombre FROM Estado'
-            cursor.execute(sql)
-            filas = cursor.fetchall()
-
-        for fila in filas:
-            estado = Estado(fila[0], fila[1])
+    def buscarEstadoFS(self):
+        for estado in self.estados:
             if estado.esAmbitoSismografo() and estado.esFueraDeServicio():
                 self.estadoFueraDeServicio = estado
-            elif estado.esAmbitoSismografo() and estado.esEnLinea():
-                self.estadoEnLinea = estado
-            elif estado.esAmbitoOI() and estado.esCerrada():
-                self.estadoCerrada = estado
+                break
 
+        self.buscarEstadoEnLinea()
+    
+    def buscarEstadoEnLinea(self):
+        for estado in self.estados:
+            if estado.esAmbitoSismografo() and estado.esEnLinea():
+                self.estadoEnLinea = estado
+                break
+        
         self.pantalla.pedirSituacionSismografo(self.estadoEnLinea.nombre, self.estadoFueraDeServicio.nombre)
 
+    def buscarEstadoCerrada(self, EnLinea=True):
+        for estado in self.estados:
+            if estado.esAmbitoOI() and estado.esCerrada():
+                self.estadoCerrada = estado
+                break
+
+        self.obtenerSismografo(EnLinea)
+
     def seleccionarEnLinea(self):
-        self.getFechaHoraActual()
+        self.buscarEstadoCerrada()
 
     def seleccionarFS(self):
         self.buscarMFS()
 
     def buscarMFS(self):
-        with sqlite3.connect(ARCHIVO_BD) as con:
-            cursor = con.cursor()
-            sql = 'SELECT descripcion FROM MotivoTipo'
-            cursor.execute(sql)
-            filas = cursor.fetchall()
+        motivos = []
+        for motivo in self.motivosTipo:
+            datos = {
+                "descripcion": motivo.getDescripcion(),
+                "motivo": motivo
+            }
+            motivos.append(datos)
 
-        for fila in filas:
-            motivo = MotivoTipo(fila[0])
-            self.motivos.append(motivo.getDescripcion())
-
-        self.pantalla.mostrarMFS(self.motivos)
+        self.pantalla.mostrarMFS(motivos)
 
     def tomarMotivoYComentario(self, motivo, comentario):
         self.motivosSeleccionados.append(motivo)
@@ -119,7 +127,16 @@ class GestorOrdenDeCierre():
         self.pantalla.pedirConfirmacion()
 
     def confirmar(self):
-        self.getFechaHoraActual(EnLinea=False)
+        self.buscarEstadoCerrada(EnLinea=False)
+
+    def obtenerSismografo(self, EnLinea):
+        estacion = self.ordenSeleccionada.getEstacion()
+        for sismografo in self.sismografos:
+            if sismografo.esTuEstacion(estacion):
+                self.sismografoSeleccionado = sismografo
+                break
+        
+        self.getFechaHoraActual(EnLinea)
 
     def getFechaHoraActual(self, EnLinea=True):
         self.fechaHoraActual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -127,32 +144,22 @@ class GestorOrdenDeCierre():
         self.ordenSeleccionada.cerrar(self.fechaHoraActual, self.estadoCerrada, self.observacion)
         
         if EnLinea:
-            self.ordenSeleccionada.habilitarSismografo(self.estadoEnLinea)
+            self.sismografoSeleccionado.habilitar(self.estadoEnLinea, self.fechaHoraActual, self.empleado)
             self.finCU()
         else:
-            self.ordenSeleccionada.fueraDeServicio(self.estadoFueraDeServicio, self.motivosSeleccionados, self.comentarios)
+            self.sismografoSeleccionado.fueraDeServicio(self.estadoFueraDeServicio, self.fechaHoraActual, self.empleado, self.motivosSeleccionados, self.comentarios)
             self.getMailResponsableReparaciones()
 
     def getMailResponsableReparaciones(self):
-        with sqlite3.connect(ARCHIVO_BD) as con:
-            cursor = con.cursor()
-            sql = (
-                'SELECT E.nombre, E.apellido, E.mail, E.telefono, R.nombre, R.descripcion '
-                'FROM Empleado E JOIN Rol R ON E.rol = R.nombre '
-            )
-            cursor.execute(sql)
-            filas = cursor.fetchall()
-
-        for fila in filas:
-            rol = Rol(fila[4], fila[5])
-            empleado = Empleado(fila[0], fila[1], fila[2], fila[3], rol)
+        for empleado in self.empleados:
             if empleado.esResponsableReparacion():
-                self.mailsResponsableReparaciones.append(empleado.getMail())
+                mail = empleado.getMail()
+                self.mailsResponsableReparaciones.append(mail)
 
         self.enviarNotificacionMail()
 
     def enviarNotificacionMail(self):
-        idSismografo = self.ordenSeleccionada.getSismografo()
+        idSismografo = self.sismografoSeleccionado.getId()
         asunto = f"Orden de Inspeccion Cerrada"
         mensaje = f"La orden de inspección para el sismógrafo {idSismografo} ha sido cerrada.\n" \
                     f"El sismografo ahora se encuentra {self.estadoFueraDeServicio.nombre}\n" \
@@ -160,7 +167,7 @@ class GestorOrdenDeCierre():
                     f"Motivos:\n"
         
         for i in range(len(self.motivosSeleccionados)):
-            motivo = MotivoTipo(self.motivosSeleccionados[i])
+            motivo = self.motivosSeleccionados[i]
             comentario = self.comentarios[i]
             mensaje += f"\t{motivo.getDescripcion()} || Comentario: {comentario}\n"
 
@@ -174,8 +181,7 @@ class GestorOrdenDeCierre():
 
         self.finCU()
 
-    def finCU(self, cancelar=False):
-        #if not cancelar:
-            #self.pantalla.cerrar()
-        #del self
+    def finCU(self):
+        # lógica para persistir los cambios
+
         self.pantalla.cerrar()

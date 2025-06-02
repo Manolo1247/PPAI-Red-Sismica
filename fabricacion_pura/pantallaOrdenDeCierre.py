@@ -11,6 +11,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         
         self.headerText = ""
         self.datosOrdenes = []
+        self.observacion = ""
         
         self.motivosGrillaX = []
 
@@ -75,6 +76,49 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         )
         cancelar_btn.pack(pady=10)
 
+    @property
+    def cuadroObservacion(self):
+        observacion_entry = ctk.CTkTextbox(self, width=400, height=100)
+        observacion_entry.pack(pady=10)
+
+        mensaje_error = ctk.CTkLabel(self, text="", text_color="red", font=("Arial", 14, "bold"))
+        mensaje_error.pack(pady=5)
+
+        def guardar_observacion():
+            self.observacion = observacion_entry.get("1.0", "end").strip()
+            if not self.observacion:
+                mensaje_error.configure(text="Debe ingresar una observación.")
+                return
+            mensaje_error.configure(text="")
+            self.tomarObservacion()
+
+        botones_frame = ctk.CTkFrame(self, fg_color="transparent")
+        botones_frame.pack(pady=20)
+
+        guardar_btn = ctk.CTkButton(
+            botones_frame,
+            text="Guardar",
+            command=guardar_observacion,
+            width=200,  
+            height=55,  
+            font=("Arial", 18, "bold"),
+            fg_color="#198754",
+            hover_color="#157347"  
+        )
+        guardar_btn.pack(side="left", padx=10)
+
+        volver_btn = ctk.CTkButton(
+            botones_frame,
+            text="Volver",
+            command=lambda: self.mostrarOI(self.datosOrdenes),
+            width=200,  
+            height=55,  
+            font=("Arial", 18, "bold"),
+            fg_color="#6c757d",      
+            hover_color="#5a6268"
+        )
+        volver_btn.pack(side="left", padx=10)
+
 
     def habilitarVentana(self):
         self.tkraise()
@@ -108,40 +152,14 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.headerText = "Ingrese la observación de cierre"
         self.header
 
-        observacion_entry = ctk.CTkTextbox(self, width=400, height=100)
-        observacion_entry.pack(pady=10)
-
-        mensaje_error = ctk.CTkLabel(self, text="", text_color="red", font=("Arial", 14, "bold"))
-        mensaje_error.pack(pady=5)
-
-        def guardar_observacion():
-            observacion = observacion_entry.get("1.0", "end").strip()
-            if not observacion:
-                mensaje_error.configure(text="Debe ingresar una observación.")
-                return
-            mensaje_error.configure(text="")
-            self.tomarObservacion(observacion)
-            # Puedes mostrar un mensaje de éxito o volver a otra pantalla
-
-        # Frame para los botones en línea
-        botones_frame = ctk.CTkFrame(self, fg_color="transparent")
-        botones_frame.pack(pady=20)
-
-        guardar_btn = ctk.CTkButton(
-            botones_frame,
-            text="Guardar",
-            command=guardar_observacion,
-            width=200,  
-            height=55,  
-            font=("Arial", 18, "bold")  
-        )
-        guardar_btn.pack(side="left", padx=10)
+        # Input para la Observación de cierre
+        self.cuadroObservacion
 
         # Botón para cancelar CU
         self.botonCancelar
 
-    def tomarObservacion(self, observacion):
-        self.gestor.tomarObservacion(observacion)
+    def tomarObservacion(self):
+        self.gestor.tomarObservacion(self.observacion)
 
     def pedirSituacionSismografo(self, estadoEnLinea, estadoFueraDeServicio):
         # Limpia la pantalla
@@ -216,12 +234,14 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             label.grid(row=0, column=col_idx, padx=10, pady=10)
 
         # Llenar la tabla con datos, cada motivo tiene un botón "Seleccionar"
-        for i, motivo in enumerate(motivos):
-            ctk.CTkLabel(tableFrame, text=getattr(motivo, "getDescripcion", lambda: str(motivo))()).grid(row=i+1, column=0, padx=10, pady=5)
+        for i, motivo_dict in enumerate(motivos):
+            descripcion = motivo_dict.get("descripcion")
+            motivo_obj = motivo_dict.get("motivo")
+            ctk.CTkLabel(tableFrame, text=descripcion).grid(row=i+1, column=0, padx=10, pady=5)
             selectButton = ctk.CTkButton(
                 tableFrame,
                 text="Seleccionar",
-                command=lambda m=motivo: self.tomarMFS(m)
+                command=lambda m=motivo_obj: self.tomarMFS(m)
             )
             selectButton.grid(row=i+1, column=1, padx=10, pady=5)
 
@@ -233,9 +253,12 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         for widget in self.winfo_children():
             widget.destroy()
 
+        # Encabezado
+        self.header
+
         label = ctk.CTkLabel(
             self,
-            text=f"Ingrese un comentario para: {getattr(motivo, 'getDescripcion', lambda: str(motivo))()}",
+            text=f"Ingrese un comentario",
             font=("Arial", 18, "bold"),
             text_color="#0d6efd"
         )
@@ -254,7 +277,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
                 return
             mensaje_error.configure(text="")
             # Elimina el motivo de la grilla antes de pasar al gestor
-            self.motivosGrillaX.remove(motivo)
+            # self.motivosGrillaX.remove(motivo)
             self.tomarComentario(motivo, comentario)
 
         # Frame para los botones en línea
@@ -283,7 +306,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             widget.destroy()
 
         # Encabezado
-        self.headerText = "Motivos de Cierre"
+        # self.headerText = "Motivos de Cierre"
         self.header
 
         # Cuerpo de la tabla (más abajo con pady extra)
@@ -297,12 +320,15 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             label.grid(row=0, column=col_idx, padx=10, pady=10)
 
         # Llenar la tabla con datos, cada motivo tiene un botón "Seleccionar"
-        for i, motivo in enumerate(self.motivosGrillaX):
-            ctk.CTkLabel(tableFrame, text=getattr(motivo, "getDescripcion", lambda: str(motivo))()).grid(row=i+1, column=0, padx=10, pady=5)
+        # Llenar la tabla con datos, cada motivo tiene un botón "Seleccionar"
+        for i, motivo_dict in enumerate(self.motivosGrillaX):
+            descripcion = motivo_dict.get("descripcion")
+            motivo_obj = motivo_dict.get("motivo")
+            ctk.CTkLabel(tableFrame, text=descripcion).grid(row=i+1, column=0, padx=10, pady=5)
             selectButton = ctk.CTkButton(
                 tableFrame,
                 text="Seleccionar",
-                command=lambda m=motivo: self.tomarMFS(m)
+                command=lambda m=motivo_obj: self.tomarMFS(m)
             )
             selectButton.grid(row=i+1, column=1, padx=10, pady=5)
 
@@ -350,6 +376,5 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
 
     def cerrar(self):
         from fabricacion_pura.pantallaInicio import PantallaInicio
-        #self.gestor.finCU(cancelar=True)
         self.controller.showFrame(PantallaInicio)
 
