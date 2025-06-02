@@ -1,6 +1,5 @@
 from entidades.estado import Estado
 from entidades.motivoFueraServicio import MotivoFueraServicio
-from entidades.motivoTipo import MotivoTipo
 from entidades.empleado import Empleado
 from typing import List
 
