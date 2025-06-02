@@ -31,6 +31,11 @@ class OrdenDeInspeccion:
     def getEstacion(self):
         return self.estacion
    
+    def cerrar(self, fechaHora, estadoCerrada, observacion):
+        self.setEstado(estadoCerrada)
+        self.setFechaHoraCierre(fechaHora)
+        self.setObservacionCierre(observacion)
+
     def setEstado(self, estado):
         self.estado = estado
 
@@ -39,8 +44,3 @@ class OrdenDeInspeccion:
 
     def setObservacionCierre(self, observacion):
         self.observacion_cierre = observacion
-
-    def cerrar(self, fechaHora, estadoCerrada, observacion):
-        self.setEstado(estadoCerrada)
-        self.setFechaHoraCierre(fechaHora)
-        self.setObservacionCierre(observacion)
