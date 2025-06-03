@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import os
 # Capa de persistencia
 from persistencia.ordenDeInspeccionModel import OrdenDeInspeccionModel
 from persistencia.sismografoModel import SismografoModel
@@ -113,13 +113,21 @@ class GestorOrdenDeCierre():
             }
             motivos.append(datos)
 
-        self.pantalla.mostrarMFS(motivos)
+        self.pantalla.mostrarMFS(motivos=motivos)
 
     def tomarMotivoYComentario(self, motivo, comentario):
         self.motivosSeleccionados.append(motivo)
         self.comentarios.append(comentario)
 
         self.pantalla.pedirConfirmacion()
+
+    def anularSeleccionMFS(self, motivo):
+        self.motivosSeleccionados.remove(motivo)
+        
+        if len(self.motivosSeleccionados) == 0:
+            self.pantalla.mostrarMFS()
+        else:
+            self.pantalla.pedirConfirmacion()
 
     def confirmar(self):
         self.buscarEstadoCerrada(EnLinea=False)
@@ -134,6 +142,7 @@ class GestorOrdenDeCierre():
         self.getFechaHoraActual(EnLinea)
 
     def getFechaHoraActual(self, EnLinea=True):
+        print("get Fecha")
         self.fechaHoraActual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         self.ordenSeleccionada.cerrar(self.fechaHoraActual, self.estadoCerrada, self.observacion)
@@ -177,8 +186,9 @@ class GestorOrdenDeCierre():
         self.finCU()
 
     def finCU(self):
+        print("fin")
         # lógica para persistir los cambios
         OrdenDeInspeccionModel.updateFromEntity(self.ordenSeleccionada)
         SismografoModel.updateFromEntity(self.sismografoSeleccionado)
-
+        print("cerrar")
         self.pantalla.cerrar()

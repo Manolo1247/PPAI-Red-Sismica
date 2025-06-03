@@ -12,8 +12,8 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.headerText = None
         self.datosOrdenes = []
         self.observacion = None
-        
-        self.motivosGrillaX = []
+        self.motivos = []
+        self.motivosSeleccionados = []
 
     @property
     def header(self):
@@ -119,6 +119,54 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         )
         volver_btn.pack(side="left", padx=10)
 
+    @property
+    def frameDeEspera(self):
+        pass
+
+    @property
+    def motivosGrilla(self):
+        # Frame contenedor horizontal
+        tablaFrame = ctk.CTkFrame(self)
+        tablaFrame.pack(fill="both", expand=True, pady=(20, 0))
+
+        # Crear encabezados de tabla
+        columnas = ["Descripción", "Seleccionar", "Anular Selección"]
+        for col_idx, col in enumerate(columnas):
+            label = ctk.CTkLabel(tablaFrame, text=col, font=("Arial", 14, "bold"))
+            label.grid(row=0, column=col_idx, padx=10, pady=10)
+
+        # Llenar la tabla con motivos No seleccionados
+        #   Tienen un botón Seleccionar
+        for i, motivo_dict in enumerate(self.motivos):
+            descripcion = motivo_dict.get("descripcion")
+            # motivo_obj = motivo_dict.get("motivo")
+            ctk.CTkLabel(tablaFrame, text=descripcion).grid(row=i+1, column=0, padx=10, pady=5)
+            selectButton = ctk.CTkButton(
+                tablaFrame,
+                text="Seleccionar",
+                command=lambda m=motivo_dict: self.tomarMFS(m)
+            )
+            selectButton.grid(row=i+1, column=1, padx=10, pady=5)
+
+        # Lenar la tabla con motivos Seleccionados
+        #   Tienen un botón Borrar
+        for i, motivo_dict in enumerate(self.motivosSeleccionados):
+            i += len(self.motivos)
+            descripcion = motivo_dict.get("descripcion")
+            # motivo_obj = motivo_dict.get("motivo")
+            ctk.CTkLabel(tablaFrame, text=descripcion).grid(row=i+1, column=0, padx=10, pady=5)
+            selectButton = ctk.CTkButton(
+                tablaFrame,
+                text="Anular Selección",
+                command=lambda m=motivo_dict: self.anularSeleccionMFS(m),
+                fg_color="#dc3545",
+                hover_color="#c82333",
+            )
+            selectButton.grid(row=i+1, column=2, padx=10, pady=5)
+
+
+
+
 
     def habilitarVentana(self):
         self.tkraise()
@@ -219,8 +267,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
     def seleccionarEnLinea(self):
         self.gestor.seleccionarEnLinea()
 
-    def mostrarMFS(self, motivos):
-        self.motivosGrillaX = motivos
+    def mostrarMFS(self, motivos=None):
+        if motivos:
+            self.motivos = motivos
         # Limpia la pantalla
         for widget in self.winfo_children():
             widget.destroy()
@@ -229,27 +278,8 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.headerText = "Motivos de Cierre"
         self.header
 
-        # Cuerpo de la tabla (más abajo con pady extra)
-        tableFrame = ctk.CTkFrame(self)
-        tableFrame.pack(fill="both", expand=True, pady=(20, 0))  # <-- agrega espacio arriba
-
-        # Crear encabezados de tabla
-        columnas = ["Descripción", "Seleccionar"]
-        for col_idx, col in enumerate(columnas):
-            label = ctk.CTkLabel(tableFrame, text=col, font=("Arial", 14, "bold"))
-            label.grid(row=0, column=col_idx, padx=10, pady=10)
-
-        # Llenar la tabla con datos, cada motivo tiene un botón "Seleccionar"
-        for i, motivo_dict in enumerate(motivos):
-            descripcion = motivo_dict.get("descripcion")
-            motivo_obj = motivo_dict.get("motivo")
-            ctk.CTkLabel(tableFrame, text=descripcion).grid(row=i+1, column=0, padx=10, pady=5)
-            selectButton = ctk.CTkButton(
-                tableFrame,
-                text="Seleccionar",
-                command=lambda m=motivo_obj: self.tomarMFS(m)
-            )
-            selectButton.grid(row=i+1, column=1, padx=10, pady=5)
+        # Tabla
+        self.motivosGrilla
 
         # Botón para cancelar CU
         self.botonCancelar
@@ -265,7 +295,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         label = ctk.CTkLabel(
             self,
             text=f"Ingrese un comentario",
-            font=("Arial", 18, "bold"),
+            font=("Arial", 30, "bold"),
             text_color="#0d6efd"
         )
         label.pack(pady=20)
@@ -282,11 +312,10 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
                 mensaje_error.configure(text="Debe ingresar un comentario.")
                 return
             mensaje_error.configure(text="")
-            # Elimina el motivo de la grilla antes de pasar al gestor
-            # self.motivosGrillaX.remove(motivo)
+            
             self.tomarComentario(motivo, comentario)
 
-        # Frame para los botones en línea
+        # Frame para los botones
         botones_frame = ctk.CTkFrame(self, fg_color="transparent")
         botones_frame.pack(pady=20)
         
@@ -304,7 +333,16 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.botonCancelar
 
     def tomarComentario(self, motivo, comentario):
-        self.gestor.tomarMotivoYComentario(motivo, comentario)
+        self.motivos.remove(motivo)
+        self.motivosSeleccionados.append(motivo)
+        
+        self.gestor.tomarMotivoYComentario(motivo.get("motivo"), comentario)
+
+    def anularSeleccionMFS(self, motivo):
+        self.motivosSeleccionados.remove(motivo)
+        self.motivos.append(motivo)
+
+        self.gestor.anularSeleccionMFS(motivo.get("motivo"))
 
     def pedirConfirmacion(self):
         # Limpia la pantalla
@@ -315,30 +353,10 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         # self.headerText = "Motivos de Cierre"
         self.header
 
-        # Cuerpo de la tabla (más abajo con pady extra)
-        tableFrame = ctk.CTkFrame(self)
-        tableFrame.pack(fill="both", expand=True, pady=(20, 0))  # <-- agrega espacio arriba
+        # Tabla
+        self.motivosGrilla
 
-        # Crear encabezados de tabla
-        columnas = ["Descripción", "Seleccionar"]
-        for col_idx, col in enumerate(columnas):
-            label = ctk.CTkLabel(tableFrame, text=col, font=("Arial", 14, "bold"))
-            label.grid(row=0, column=col_idx, padx=10, pady=10)
-
-        # Llenar la tabla con datos, cada motivo tiene un botón "Seleccionar"
-        # Llenar la tabla con datos, cada motivo tiene un botón "Seleccionar"
-        for i, motivo_dict in enumerate(self.motivosGrillaX):
-            descripcion = motivo_dict.get("descripcion")
-            motivo_obj = motivo_dict.get("motivo")
-            ctk.CTkLabel(tableFrame, text=descripcion).grid(row=i+1, column=0, padx=10, pady=5)
-            selectButton = ctk.CTkButton(
-                tableFrame,
-                text="Seleccionar",
-                command=lambda m=motivo_obj: self.tomarMFS(m)
-            )
-            selectButton.grid(row=i+1, column=1, padx=10, pady=5)
-
-        # Frame para los botones en línea
+        # Frame para los botones
         botones_frame = ctk.CTkFrame(self, fg_color="transparent")
         botones_frame.pack(pady=20)
 
@@ -378,7 +396,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         )
         mensaje_label.pack(pady=10)
         # Llamar a la lógica real después de actualizar la UI
-        self.after(100, self.gestor.confirmar)
+        self.gestor.confirmar()
 
     def cerrar(self):
         from fabricacion_pura.pantallaInicio import PantallaInicio
