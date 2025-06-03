@@ -1,5 +1,4 @@
 import customtkinter as ctk
-import sys
 from fabricacion_pura.gestor import GestorOrdenDeCierre
 
 class PantallaOrdenDeCierre(ctk.CTkFrame):
