@@ -64,7 +64,7 @@ class GestorOrdenDeCierre():
     def ordenarOI(self, ordenes):
         # Ordenar las ordenes de inspección por fecha de finalización (de más vieja a más nueva)
         ordenes.sort(key=lambda x: x["fechaFinalizacion"])
-        self.pantalla.mostrarOI(ordenes)
+        self.pantalla.mostrarOI(ordenes=ordenes)
 
     def tomarOrden(self, orden):
         self.ordenSeleccionada = orden
@@ -88,7 +88,7 @@ class GestorOrdenDeCierre():
                 self.estadoEnLinea = estado
                 break
         
-        self.pantalla.pedirSituacionSismografo(self.estadoEnLinea.nombre, self.estadoFueraDeServicio.nombre)
+        self.pantalla.pedirSituacionSismografo(estadoEnLinea=self.estadoEnLinea.nombre, estadoFueraDeServicio=self.estadoFueraDeServicio.nombre)
 
     def buscarEstadoCerrada(self, EnLinea=True):
         for estado in self.estados:
@@ -107,6 +107,9 @@ class GestorOrdenDeCierre():
     def buscarMFS(self):
         motivos = []
         for motivo in self.motivosTipo:
+            if motivo in self.motivosSeleccionados:
+                continue
+    
             datos = {
                 "descripcion": motivo.getDescripcion(),
                 "motivo": motivo

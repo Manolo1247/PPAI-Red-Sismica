@@ -110,18 +110,14 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         volver_btn = ctk.CTkButton(
             botones_frame,
             text="Volver",
-            command=lambda: self.mostrarOI(self.datosOrdenes),
+            command=self.mostrarOI,
             width=200,  
             height=55,  
             font=("Arial", 18, "bold"),
             fg_color="#6c757d",      
             hover_color="#5a6268"
         )
-        volver_btn.pack(side="left", padx=10)
-
-    @property
-    def frameDeEspera(self):
-        pass
+        volver_btn.pack(side="left", padx=10)      
 
     @property
     def motivosGrilla(self):
@@ -164,7 +160,20 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             )
             selectButton.grid(row=i+1, column=2, padx=10, pady=5)
 
-
+    @property
+    def botonConfirmar(self):
+        # Botón de confirmación
+        confirmar_btn = ctk.CTkButton(
+            self,
+            text="Confirmar",
+            font=("Arial", 18, "bold"),
+            fg_color="#198754",
+            hover_color="#157347",
+            width=200,
+            height=50,
+            command=self.confirmar
+        )
+        confirmar_btn.pack(pady=10)
 
 
 
@@ -172,7 +181,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.tkraise()
         self.gestor = GestorOrdenDeCierre(self.sesion, self)
 
-    def mostrarOI(self, ordenes):
+    def mostrarOI(self, ordenes=None):
+        if ordenes:
+            self.datosOrdenes = ordenes
         # Limpia la pantalla
         for widget in self.winfo_children():
             widget.destroy()
@@ -182,7 +193,6 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.header
 
         # tabla 
-        self.datosOrdenes = ordenes
         self.ordenesGrilla
 
         # Botón para cancelar CU
@@ -209,7 +219,12 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
     def tomarObservacion(self):
         self.gestor.tomarObservacion(self.observacion)
 
-    def pedirSituacionSismografo(self, estadoEnLinea, estadoFueraDeServicio):
+    def pedirSituacionSismografo(self, estadoEnLinea=None, estadoFueraDeServicio=None):
+        if estadoEnLinea:
+            self.estadoEnLinea = estadoEnLinea
+        if estadoFueraDeServicio:
+            self.estadoFueraDeServicio = estadoFueraDeServicio
+        
         # Limpia la pantalla
         for widget in self.winfo_children():
             widget.destroy()
@@ -225,7 +240,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         # Estado En Línea
         en_linea_label = ctk.CTkLabel(
             estados_frame,
-            text=estadoEnLinea,
+            text=self.estadoEnLinea,
             font=("Arial", 20, "bold"),
             text_color="#198754"
         )
@@ -243,7 +258,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         # Estado Fuera de Servicio
         fs_label = ctk.CTkLabel(
             estados_frame,
-            text=estadoFueraDeServicio,
+            text=self.estadoFueraDeServicio,
             font=("Arial", 20, "bold"),
             text_color="#dc3545"
         )
@@ -280,6 +295,19 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
 
         # Tabla
         self.motivosGrilla
+
+        # botón volver
+        volver_btn = ctk.CTkButton(
+            self,
+            text="Volver",
+            command=self.pedirSituacionSismografo,
+            width=200,  
+            height=55,  
+            font=("Arial", 18, "bold"),
+            fg_color="#6c757d",      
+            hover_color="#5a6268"
+        )
+        volver_btn.pack(pady=10)  
 
         # Botón para cancelar CU
         self.botonCancelar
@@ -350,28 +378,27 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             widget.destroy()
 
         # Encabezado
-        # self.headerText = "Motivos de Cierre"
+        self.headerText = "Motivos de Cierre"
         self.header
 
         # Tabla
         self.motivosGrilla
 
-        # Frame para los botones
-        botones_frame = ctk.CTkFrame(self, fg_color="transparent")
-        botones_frame.pack(pady=20)
-
         # Botón de confirmación
-        confirmar_btn = ctk.CTkButton(
-            botones_frame,
-            text="Confirmar",
+        self.botonConfirmar
+
+        # Botón volver
+        volver_btn = ctk.CTkButton(
+            self,
+            text="Volver",
+            command=self.pedirSituacionSismografo,
+            width=200,  
+            height=55,  
             font=("Arial", 18, "bold"),
-            fg_color="#198754",
-            hover_color="#157347",
-            width=200,
-            height=50,
-            command=self.confirmar
+            fg_color="#6c757d",      
+            hover_color="#5a6268"
         )
-        confirmar_btn.pack(side="left", padx=10)
+        volver_btn.pack(pady=10)  
 
         # Botón para cancelar CU
         self.botonCancelar
