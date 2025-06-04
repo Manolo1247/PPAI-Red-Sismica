@@ -7,8 +7,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.controller = controller
         
         self.sesion = sesion
-        
         self.headerText = None
+        self.btn_frame = None
+
         self.datosOrdenes = []
         self.observacion = None
         self.motivos = []
@@ -62,9 +63,12 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
 
     @property
     def botonCancelar(self):
+        boton_frame = ctk.CTkFrame(self, fg_color="transparent")
+        boton_frame.pack()
+
         # Botón para cancelar CU
         cancelar_btn = ctk.CTkButton(
-            self,
+            boton_frame,
             text="Cancelar",
             fg_color="#dc3545",  # Rojo Bootstrap
             hover_color="#c82333",  # Hover más oscuro
@@ -91,11 +95,11 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             mensaje_error.configure(text="")
             self.tomarObservacion()
 
-        botones_frame = ctk.CTkFrame(self, fg_color="transparent")
-        botones_frame.pack(pady=20)
+        self.btn_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.btn_frame.pack(pady=20)
 
         guardar_btn = ctk.CTkButton(
-            botones_frame,
+            self.btn_frame,
             text="Guardar",
             command=guardar_observacion,
             width=200,  
@@ -107,7 +111,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         guardar_btn.pack(side="left", padx=10)
 
         volver_btn = ctk.CTkButton(
-            botones_frame,
+            self.btn_frame,
             text="Volver",
             command=self.mostrarOI,
             width=200,  
@@ -163,17 +167,16 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
     def botonConfirmar(self):
         # Botón de confirmación
         confirmar_btn = ctk.CTkButton(
-            self,
+            self.btn_frame,
             text="Confirmar",
             font=("Arial", 18, "bold"),
             fg_color="#198754",
             hover_color="#157347",
             width=200,
-            height=50,
+            height=55,
             command=self.confirmar
         )
-        confirmar_btn.pack(pady=10)
-
+        confirmar_btn.pack(pady=10, side="left", padx=10)
 
 
     def habilitarVentana(self):
@@ -383,12 +386,16 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         # Tabla
         self.motivosGrilla
 
+        
+        self.btn_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.btn_frame.pack()
+        
         # Botón de confirmación
         self.botonConfirmar
 
         # Botón volver
         volver_btn = ctk.CTkButton(
-            self,
+            self.btn_frame,
             text="Volver",
             command=self.pedirSituacionSismografo,
             width=200,  
@@ -397,7 +404,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             fg_color="#6c757d",      
             hover_color="#5a6268"
         )
-        volver_btn.pack(pady=10)  
+        volver_btn.pack(pady=10, side="left", padx=10)  
 
         # Botón para cancelar CU
         self.botonCancelar
