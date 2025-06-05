@@ -3,7 +3,7 @@ import sys
 from fabricacion_pura.pantallaOrdenDeCierre import PantallaOrdenDeCierre
 
 class PantallaInicio(ctk.CTkFrame):
-    def __init__(self, parent, controller, sesion):
+    def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
     
@@ -66,5 +66,5 @@ class PantallaInicio(ctk.CTkFrame):
         # Añadir bordes sutiles en el cuerpo y el encabezado, para un efecto de separación
         self.mainFrame.configure(border_color="#dcdcdc", border_width=1)  # Borde de separación
 
-    def habilitarVentana(self):
+    def habilitarVentana(self, sesion):
         self.tkraise()

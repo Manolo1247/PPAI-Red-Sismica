@@ -2,11 +2,11 @@ import customtkinter as ctk
 from fabricacion_pura.gestor import GestorOrdenDeCierre
 
 class PantallaOrdenDeCierre(ctk.CTkFrame):
-    def __init__(self, parent, controller, sesion):
+    def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
         
-        self.sesion = sesion
+        # self.sesion = sesion
         self.headerText = None
         self.btn_frame = None
 
@@ -179,9 +179,9 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         confirmar_btn.pack(pady=10, side="left", padx=10)
 
 
-    def habilitarVentana(self):
+    def habilitarVentana(self, sesion):
         self.tkraise()
-        self.gestor = GestorOrdenDeCierre(self.sesion, self)
+        self.gestor = GestorOrdenDeCierre(sesion, self)
 
     def mostrarOI(self, ordenes=None):
         if ordenes:

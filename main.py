@@ -32,11 +32,11 @@ class Pantalla(ctk.CTk):
         if self.current_frame is not None:
             self.current_frame.destroy()
         # Crear una nueva instancia del frame
-        frame = frame_class(self.container, self, self.sesion)
+        frame = frame_class(self.container, self)
         frame.grid(row=0, column=0, sticky=ctk.NSEW)
         self.current_frame = frame
         if hasattr(frame, 'habilitarVentana'):
-            frame.habilitarVentana()
+            frame.habilitarVentana(self.sesion)
         # frame.tkraise()
 
 if __name__ == "__main__":
