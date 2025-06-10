@@ -116,7 +116,10 @@ class GestorOrdenDeCierre():
             }
             motivos.append(datos)
 
-        self.pantalla.mostrarMFS(motivos=motivos)
+        if len(self.motivosSeleccionados) == 0:
+            self.pantalla.mostrarMFS(motivos=motivos)
+        else:
+            self.pantalla.pedirConfirmacion()
 
     def tomarMotivoYComentario(self, motivo, comentario):
         self.motivosSeleccionados.append(motivo)
@@ -145,7 +148,6 @@ class GestorOrdenDeCierre():
         self.getFechaHoraActual(EnLinea)
 
     def getFechaHoraActual(self, EnLinea=True):
-        print("get Fecha")
         self.fechaHoraActual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         self.ordenSeleccionada.cerrar(self.fechaHoraActual, self.estadoCerrada, self.observacion)
@@ -178,20 +180,23 @@ class GestorOrdenDeCierre():
             comentario = self.comentarios[i]
             mensaje += f"\t{motivo.getDescripcion()} || Comentario: {comentario}\n"
 
-        for mail in self.mailsResponsableReparaciones:
-            InterfazMail.enviarMail(mail, asunto, mensaje)
+        popUp = InterfazMail(self.pantalla, self.mailsResponsableReparaciones, asunto, mensaje)
+        popUp.grab_set()
+        popUp.wait_window()
 
         self.publicarMonitores()
 
     def publicarMonitores(self):
-        PantallaCCRS.publicar()
+        idSismografo = self.sismografoSeleccionado.getId()
+        popUp = PantallaCCRS(self.pantalla, idSismografo)
+        popUp.grab_set()
+        popUp.wait_window()
 
         self.finCU()
 
     def finCU(self):
-        print("fin")
         # lógica para persistir los cambios
         OrdenDeInspeccionModel.updateFromEntity(self.ordenSeleccionada)
         SismografoModel.updateFromEntity(self.sismografoSeleccionado)
-        print("cerrar")
+
         self.pantalla.cerrar()
