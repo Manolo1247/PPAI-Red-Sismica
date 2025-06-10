@@ -72,15 +72,15 @@ class GestorOrdenDeCierre():
 
     def tomarObservacion(self, observacion):
         self.observacion = observacion
-        self.buscarEstadoFS()
+        self.pantalla.pedirSituacionSismografo()
 
     def buscarEstadoFS(self):
         for estado in self.estados:
             if estado.esAmbitoSismografo() and estado.esFueraDeServicio():
                 self.estadoFueraDeServicio = estado
                 break
-
-        self.buscarEstadoEnLinea()
+        
+        self.buscarMFS()
     
     def buscarEstadoEnLinea(self):
         for estado in self.estados:
@@ -88,7 +88,7 @@ class GestorOrdenDeCierre():
                 self.estadoEnLinea = estado
                 break
         
-        self.pantalla.pedirSituacionSismografo(estadoEnLinea=self.estadoEnLinea.nombre, estadoFueraDeServicio=self.estadoFueraDeServicio.nombre)
+        self.buscarEstadoCerrada()
 
     def buscarEstadoCerrada(self, EnLinea=True):
         for estado in self.estados:
@@ -99,10 +99,10 @@ class GestorOrdenDeCierre():
         self.obtenerSismografo(EnLinea)
 
     def seleccionarEnLinea(self):
-        self.buscarEstadoCerrada()
+        self.buscarEstadoEnLinea()
 
     def seleccionarFS(self):
-        self.buscarMFS()
+        self.buscarEstadoFS()
 
     def buscarMFS(self):
         motivos = []

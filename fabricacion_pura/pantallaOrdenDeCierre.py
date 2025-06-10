@@ -221,12 +221,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
     def tomarObservacion(self):
         self.gestor.tomarObservacion(self.observacion)
 
-    def pedirSituacionSismografo(self, estadoEnLinea=None, estadoFueraDeServicio=None):
-        if estadoEnLinea:
-            self.estadoEnLinea = estadoEnLinea
-        if estadoFueraDeServicio:
-            self.estadoFueraDeServicio = estadoFueraDeServicio
-        
+    def pedirSituacionSismografo(self):        
         # Limpia la pantalla
         for widget in self.winfo_children():
             widget.destroy()
@@ -242,7 +237,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         # Estado En Línea
         en_linea_label = ctk.CTkLabel(
             estados_frame,
-            text=self.estadoEnLinea,
+            text="En Linea",
             font=("Arial", 20, "bold"),
             text_color="#198754"
         )
@@ -260,7 +255,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         # Estado Fuera de Servicio
         fs_label = ctk.CTkLabel(
             estados_frame,
-            text=self.estadoFueraDeServicio,
+            text="Fuera de Servicio",
             font=("Arial", 20, "bold"),
             text_color="#dc3545"
         )
