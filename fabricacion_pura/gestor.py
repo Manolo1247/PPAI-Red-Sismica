@@ -187,8 +187,7 @@ class GestorOrdenDeCierre():
         self.publicarMonitores()
 
     def publicarMonitores(self):
-        idSismografo = self.sismografoSeleccionado.getId()
-        popUp = PantallaCCRS(self.pantalla, idSismografo)
+        popUp = PantallaCCRS(self.pantalla)
         popUp.grab_set()
         popUp.wait_window()
 
