@@ -9,6 +9,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         # self.sesion = sesion
         self.headerText = None
         self.btn_frame = None
+        self.motivo = None
 
         self.datosOrdenes = []
         self.observacion = None
@@ -108,19 +109,7 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
             fg_color="#198754",
             hover_color="#157347"  
         )
-        guardar_btn.pack(side="left", padx=10)
-
-        volver_btn = ctk.CTkButton(
-            self.btn_frame,
-            text="Volver",
-            command=self.mostrarOI,
-            width=200,  
-            height=55,  
-            font=("Arial", 18, "bold"),
-            fg_color="#6c757d",      
-            hover_color="#5a6268"
-        )
-        volver_btn.pack(side="left", padx=10)      
+        guardar_btn.pack(side="left", padx=10)      
 
     @property
     def motivosGrilla(self):
@@ -178,6 +167,45 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         )
         confirmar_btn.pack(pady=10, side="left", padx=10)
 
+    @property
+    def cuadroComentario(self):
+        label = ctk.CTkLabel(
+            self,
+            text=f"Ingrese un comentario",
+            font=("Arial", 30, "bold"),
+            text_color="#0d6efd"
+        )
+        label.pack(pady=20)
+
+        comentario_entry = ctk.CTkTextbox(self, width=400, height=100)
+        comentario_entry.pack(pady=10)
+
+        mensaje_error = ctk.CTkLabel(self, text="", text_color="red", font=("Arial", 14, "bold"))
+        mensaje_error.pack(pady=5)
+
+        # Frame para los botones
+        self.btn_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.btn_frame.pack(pady=20)
+
+        def guardarComentario():
+            comentario = comentario_entry.get("1.0", "end").strip()
+            if not comentario:
+                mensaje_error.configure(text="Debe ingresar un comentario.")
+                return
+            mensaje_error.configure(text="")
+            
+            self.tomarComentario(comentario)
+
+        guardar_btn = ctk.CTkButton(
+            self.btn_frame,
+            text="Guardar Comentario",
+            command=guardarComentario,
+            width=200,  
+            height=55,  
+            font=("Arial", 18, "bold")  
+        )
+        guardar_btn.pack(pady=10, side="left", padx=10)
+
 
     def habilitarVentana(self, sesion):
         self.tkraise()
@@ -214,6 +242,19 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
 
         # Input para la Observación de cierre
         self.cuadroObservacion
+
+        # Boton volver
+        volver_btn = ctk.CTkButton(
+            self.btn_frame,
+            text="Volver",
+            command=self.mostrarOI,
+            width=200,  
+            height=55,  
+            font=("Arial", 18, "bold"),
+            fg_color="#6c757d",      
+            hover_color="#5a6268"
+        )
+        volver_btn.pack(side="left", padx=10)
 
         # Botón para cancelar CU
         self.botonCancelar
@@ -310,6 +351,8 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         self.botonCancelar
 
     def tomarMFS(self, motivo):
+        self.motivo = motivo
+
         # Limpia la pantalla y muestra campo para comentario del motivo seleccionado
         for widget in self.winfo_children():
             widget.destroy()
@@ -317,51 +360,37 @@ class PantallaOrdenDeCierre(ctk.CTkFrame):
         # Encabezado
         self.header
 
-        label = ctk.CTkLabel(
-            self,
-            text=f"Ingrese un comentario",
-            font=("Arial", 30, "bold"),
-            text_color="#0d6efd"
-        )
-        label.pack(pady=20)
-
-        comentario_entry = ctk.CTkTextbox(self, width=400, height=100)
-        comentario_entry.pack(pady=10)
-
-        mensaje_error = ctk.CTkLabel(self, text="", text_color="red", font=("Arial", 14, "bold"))
-        mensaje_error.pack(pady=5)
-
-        def guardarComentario():
-            comentario = comentario_entry.get("1.0", "end").strip()
-            if not comentario:
-                mensaje_error.configure(text="Debe ingresar un comentario.")
-                return
-            mensaje_error.configure(text="")
-            
-            self.tomarComentario(motivo, comentario)
-
-        # Frame para los botones
-        botones_frame = ctk.CTkFrame(self, fg_color="transparent")
-        botones_frame.pack(pady=20)
+        # Ingreso del comentario
+        self.cuadroComentario
         
-        guardar_btn = ctk.CTkButton(
-            botones_frame,
-            text="Guardar Comentario",
-            command=guardarComentario,
+        # Botón volver
+        def volver():
+            self.motivo = None
+            if len(self.motivosSeleccionados) == 0:
+                return self.mostrarMFS()
+            else:
+                return self.pedirConfirmacion()
+
+        volver_btn = ctk.CTkButton(
+            self.btn_frame,
+            text="Volver",
+            command=volver,
             width=200,  
             height=55,  
-            font=("Arial", 18, "bold")  
+            font=("Arial", 18, "bold"),
+            fg_color="#6c757d",      
+            hover_color="#5a6268"
         )
-        guardar_btn.pack(side="left", padx=10)
+        volver_btn.pack(pady=10, side="left", padx=10)
 
         # Botón para cancelar CU
         self.botonCancelar
 
-    def tomarComentario(self, motivo, comentario):
-        self.motivos.remove(motivo)
-        self.motivosSeleccionados.append(motivo)
-        
-        self.gestor.tomarMotivoYComentario(motivo.get("motivo"), comentario)
+    def tomarComentario(self, comentario):
+        self.motivos.remove(self.motivo)
+        self.motivosSeleccionados.append(self.motivo)
+
+        self.gestor.tomarMotivoYComentario(self.motivo.get("motivo"), comentario)
 
     def anularSeleccionMFS(self, motivo):
         self.motivosSeleccionados.remove(motivo)
