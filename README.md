@@ -11,7 +11,7 @@
    pip install pipenv
    ```
 
-3.**Instala peewee**
+3. **Instala peewee**
    ```
    pipenv install peewee
    ```
