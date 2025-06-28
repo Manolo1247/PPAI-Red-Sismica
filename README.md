@@ -11,17 +11,22 @@
    pip install pipenv
    ```
 
-3. **Crea el entorno virtual e instala las dependencias (solo la primera vez):**
+3.**Instala peewee**
+   ```
+   pipenv install peewee
+   ```
+
+4. **Crea el entorno virtual e instala las dependencias (solo la primera vez):**
    ```bash
    pipenv install
    ```
 
-4. **Activa el entorno virtual (debes hacerlo cada vez que abras una nueva terminal):**
+5. **Activa el entorno virtual (debes hacerlo cada vez que abras una nueva terminal):**
    ```bash
-   pipenv shell
+   pipenv shell   pip install pipenv
    ```
 
-5. **Ejecuta la aplicación:**
+6. **Ejecuta la aplicación:**
    ```bash
    python main.py
    ```
